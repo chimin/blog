@@ -8,7 +8,7 @@ export default function Home(props) {
   return (
     <ul>
       {props.posts.map(post => (
-        <li><Link href={`posts/${post}`}>{post}</Link></li>
+        <li key={post}><Link href={`/posts/${post}`}>{post}</Link></li>
       ))}
     </ul>
   )

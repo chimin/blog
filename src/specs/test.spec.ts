@@ -1,19 +1,20 @@
-import { writeFileSync } from 'fs';
-import * as webdriver from 'selenium-webdriver';
-import * as chrome from 'selenium-webdriver/chrome';
-import * as chromedriver from 'chromedriver';
+import { saveScreenshot } from './helpers/screenshot.helper';
+import { startDriver } from './helpers/webdriver.helper';
 
-chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
 describe('test', () => {
-    it('should pass', async () => {
-        const driver = await new webdriver.Builder().forBrowser('chrome').build();
-        try {
-            await driver.get('http://localhost:3000');
-            const screenshot = await driver.takeScreenshot();
-            writeFileSync('screenshot.png', Buffer.from(screenshot, 'base64'));
-        } finally {
-            await driver.quit();
-        }
-    });
+    const urls = [
+        '/',
+        '/posts/first-post',
+        '/posts/second-post'
+    ];
+
+    for (const url of urls) {
+        it(`should load ${url}`, async () => {
+            const driver = await startDriver();
+            await driver.get(`http://localhost:3000${url}`);
+            await saveScreenshot(driver, url.replace(/\//g, '_'));
+        });
+    }
 });
