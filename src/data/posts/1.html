@@ -1,35 +1,22 @@
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   I have a laptop and a mobile device. It will be very convenient if I can send the page URL from my laptop to my mobile
   device so I can continue to browse it on my mobile device. I know many browsers allow you to send the tab over to
   another the mobile device now, but I think it's easier to just show a QR code and scan it with your mobile device. It
   doesn't require any setup and mobile devices that are not belong to you can use it also.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What is the plan?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Make a Chrome extension that add a button to the browser toolbar to show the QR code with the URL of the active tab.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>How to start?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>Installed these tools on your machine.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li><a href="https://nodejs.org/en/">Node.js + NPM</a></li>
   <li>
@@ -37,9 +24,7 @@
     &nbsp;(or any IDE you prefer)
   </li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:paragraph -->
 <p>
   I will use&nbsp;
   <a href="https://www.typescriptlang.org/">Typescript</a>
@@ -47,13 +32,9 @@
   <a href="https://webpack.js.org/">Webpack</a>
   &nbsp;in the project.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What to do?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>
     Create a new directory and open it with&nbsp;
@@ -67,9 +48,7 @@
   </li>
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 {
     "name": "Current page URL to QR code",
@@ -97,9 +76,7 @@
     }
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     <strong>name</strong>
@@ -164,9 +141,7 @@
     : Icons for your Chrome extension
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":4} -->
 <ol start="4">
   <li>
     Create a file named&nbsp;
@@ -179,13 +154,9 @@
     to add dependencies later.
   </li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">{}</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list {"ordered":true,"start":6} -->
 <ol start="6">
   <li>
     Create a file named&nbsp;
@@ -194,9 +165,7 @@
   </li>
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 {
     "compilerOptions": {
@@ -206,9 +175,7 @@
     }
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     <strong>sourceMap</strong>
@@ -227,24 +194,18 @@
     &nbsp;directory.
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":8} -->
 <ol start="8">
   <li>
     Open a terminal window in Visual Studio Code (Ctrl+`) and type this command to install the required dependencies for
     development work:
   </li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 npm install --save-dev @types/chrome webpack webpack-cli typescript ts-loader html-webpack-plugin</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     <strong>@types/chrome</strong>
@@ -271,9 +232,7 @@ npm install --save-dev @types/chrome webpack webpack-cli typescript ts-loader ht
     : Webpack plugin to compile HTML files.
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":9} -->
 <ol start="9">
   <li>
     Create a file named&nbsp;
@@ -282,9 +241,7 @@ npm install --save-dev @types/chrome webpack webpack-cli typescript ts-loader ht
   </li>
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -315,9 +272,7 @@ module.exports = {
     }
 };</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     <strong>entry</strong>
@@ -348,9 +303,7 @@ module.exports = {
     : Processing rules for loader module. We enable the ts-loader module here to compile the Typescript files.
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":11} -->
 <ol start="11">
   <li>
     Create a file named&nbsp;
@@ -365,9 +318,7 @@ module.exports = {
   </li>
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
     chrome.declarativeContent.onPageChanged.addRules([{
@@ -378,9 +329,7 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
     }]);
 });</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>This script will enable showing the popup button in the toolbar for all websites.</li>
   <li>
@@ -393,9 +342,7 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
     .
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":13} -->
 <ol start="13">
   <li>
     Create a file named&nbsp;
@@ -410,9 +357,7 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
   </li>
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"xml"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 &lt;style&gt;
     canvas {
@@ -423,9 +368,7 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
 &lt;canvas id="canvas" width="450" height="450"&gt;&lt;/canvas&gt;
 &lt;div style="text-align:center"&gt;Powered by &lt;a href="https://github.com/soldair/node-qrcode"&gt;soldair/node-qrcode&lt;/a&gt;&lt;/div&gt;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     This will just show a canvas with specified size. We will generate the QR code from&nbsp;
@@ -440,9 +383,7 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
     .
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":15} -->
 <ol start="15">
   <li>
     Create a file named&nbsp;
@@ -466,16 +407,12 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, () =&gt; {
     &nbsp;NPM module:
   </li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 npm install qrcode
 npm install --save-dev @types/qrcode</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     <strong>qrcode</strong>
@@ -486,15 +423,11 @@ npm install --save-dev @types/qrcode</pre
     : Typescript definition file for qrcode library.
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":18} -->
 <ol start="18">
   <li>Put in the following contents:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import * as QRCode from 'qrcode';
 
@@ -508,9 +441,7 @@ chrome.tabs.query({
     }
 });</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list -->
 <ul>
   <li>
     This script will get the URL of the active and generate a QR code into the canvas in&nbsp;
@@ -527,19 +458,13 @@ chrome.tabs.query({
     .
   </li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:list {"ordered":true,"start":19} -->
 <ol start="19">
   <li>Open a terminal window in Visual Studio Code (Ctrl+`) and type this command to build the project:</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
 <pre class="wp-block-syntaxhighlighter-code">npx webpack --build</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:list {"ordered":true,"start":20} -->
 <ol start="20">
   <li>
     You should see&nbsp;
@@ -547,13 +472,9 @@ chrome.tabs.query({
     &nbsp;directory is created.
   </li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2 id="how-to-test-it">How to test it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>
     Open Chrome and navigate to
@@ -562,57 +483,33 @@ chrome.tabs.query({
   </li>
   <li>Turn on 'Developer mode'.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:image {"align":"center","id":21,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/05/image-1.png?w=217" alt="" class="wp-image-21" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/1/image-1.png" alt="" class="wp-image-21" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:list {"ordered":true,"start":3} -->
 <ol start="3">
   <li>Click 'Load unpacked' and select your project directory to load your project as Chrome extension.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:image {"align":"center","id":20,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/05/image.png?w=484" alt="" class="wp-image-20" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/1/image.png" alt="" class="wp-image-20" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:list {"ordered":true,"start":4} -->
 <ol start="4">
   <li>You should see your extension appears in the list.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:image {"align":"center","id":22,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/05/image-2.png?w=512" alt="" class="wp-image-22" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/1/image-2.png" alt="" class="wp-image-22" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:list {"ordered":true,"start":5} -->
 <ol start="5">
   <li>Open any website and you should see your button in the toolbar.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:image {"id":44,"sizeSlug":"large"} -->
-<figure class="wp-block-image size-large">
-  <img src="https://c4compile.files.wordpress.com/2020/05/image-5.png?w=984" alt="" class="wp-image-44" />
-</figure>
-<!-- /wp:image -->
+<figure class="wp-block-image size-large"><img src="/assets/posts/1/image-5.png" alt="" class="wp-image-44" /></figure>
 
-<!-- wp:list {"ordered":true,"start":6} -->
 <ol start="6">
   <li>
     You can see the sample on
@@ -626,4 +523,3 @@ chrome.tabs.query({
     <a href="https://github.com/chimin/chrome-extension-qrcode">https://github.com/chimin/chrome-extension-qrcode</a>
   </li>
 </ol>
-<!-- /wp:list -->

@@ -1,49 +1,28 @@
-<!-- wp:paragraph -->
 <p>This is continued from xxx.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want to build my software and deploy it to the Docker instance.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>A Docker registry to store the Docker images.</li>
   <li>A CodeBuild setup to build the software.</li>
   <li>A CodeDeploy setup to deploy the software.</li>
   <li>A CodePipeline setup to build and deploy the software.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":559,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2021/01/template1-designer-3-1.png?w=1024"
-      alt=""
-      class="wp-image-559"
-    />
+    <img src="/assets/posts/22/template1-designer-3-1.png" alt="" class="wp-image-559" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong>
@@ -53,20 +32,14 @@
   <strong>07-container-codepipeline-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Container</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We need to add the policy to allow the container service to grab the images from our new Docker registry. Change the
   WebServerContainerExecutionServerRole like this:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -74,32 +47,32 @@
         <td>1</td>
         <td>
           <code>
-              WebServerContainerExecutionServerRole:
+            &nbsp;&nbsp;WebServerContainerExecutionServerRole:
             <br />
-                Type: AWS::IAM::Role
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
             <br />
-                Properties:
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
             <br />
             ...
             <br />
-                  Policies:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies:
             <br />
-                    - PolicyName: WebServerContainerExecutionServiceRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;PolicyName:&nbsp;WebServerContainerExecutionServiceRole
             <br />
-                      PolicyDocument:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
             <br />
-                        Version: "2012-10-17"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
             <br />
-                        Statement:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
             <br />
             ...
             <br />
             <span class="has-inline-color has-vivid-green-cyan-color">
-                            - Resource: !Sub ${CodePipelineContainerRegistry.Arn}
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${CodePipelineContainerRegistry.Arn}
               <br />
-                              Action: ecr:*
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;ecr:*
               <br />
-                              Effect: Allow
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
             </span>
           </code>
         </td>
@@ -110,17 +83,17 @@
         <td>
           <code>
             <span class="has-inline-color has-vivid-green-cyan-color">
-                            - Resource: "*"
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;"*"
               <br />
-                              Action:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
               <br />
-                                - ecr:GetAuthorizationToken
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecr:GetAuthorizationToken
               <br />
-                                - ecs:DeregisterTaskDefinition
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecs:DeregisterTaskDefinition
               <br />
-                                - ecs:RegisterTaskDefinition
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecs:RegisterTaskDefinition
               <br />
-                              Effect: Allow
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
             </span>
           </code>
         </td>
@@ -129,17 +102,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Build and Deploy Pipeline</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We will need to setup a pipeline to build and deploy our software. Add these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -147,9 +114,9 @@
         <td>1</td>
         <td>
           <code>
-              CodePipelineContainerRegistry:
+            &nbsp;&nbsp;CodePipelineContainerRegistry:
             <br />
-                Type: AWS::ECR::Repository
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::ECR::Repository
           </code>
         </td>
         <td>The Docker registry to store the Docker images.</td>
@@ -169,47 +136,47 @@
         <td>3</td>
         <td>
           <code>
-              CodeBuildServiceRole:
+            &nbsp;&nbsp;CodeBuildServiceRole:
             <br />
-                Type: AWS::IAM::Role
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
             <br />
-                Properties:
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
             <br />
-                  AssumeRolePolicyDocument:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssumeRolePolicyDocument:
             <br />
-                    Version: "2012-10-17"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
             <br />
-                    Statement:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
             <br />
-                      - Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
             <br />
-                        Principal:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
             <br />
-                          Service: codebuild.amazonaws.com
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;codebuild.amazonaws.com
             <br />
-                        Action:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
             <br />
-                          - sts:AssumeRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;sts:AssumeRole
             <br />
-                  Policies:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies:
             <br />
-                    - PolicyName: CodeBuildServicePolicy
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;PolicyName:&nbsp;CodeBuildServicePolicy
             <br />
-                      PolicyDocument:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
             <br />
-                        Version: "2012-10-17"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
             <br />
-                        Statement:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
             <br />
-                          - Resource:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:
             <br />
-                              - !Sub ${CodePipelineBucket.Arn}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Sub&nbsp;${CodePipelineBucket.Arn}
             <br />
-                              - !Sub ${CodePipelineBucket.Arn}/*
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Sub&nbsp;${CodePipelineBucket.Arn}/*
             <br />
-                            Action: s3:*
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;s3:*
             <br />
-                            Effect: Allo
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allo
           </code>
           w
         </td>
@@ -219,11 +186,11 @@
         <td></td>
         <td>
           <code>
-                          - Resource: !Sub ${CodePipelineContainerRegistry.Arn}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${CodePipelineContainerRegistry.Arn}
             <br />
-                            Action: ecr:*
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;ecr:*
             <br />
-                            Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
           </code>
         </td>
         <td>And the Docker registry.</td>
@@ -232,11 +199,11 @@
         <td></td>
         <td>
           <code>
-                          - Resource: "*"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;"*"
             <br />
-                            Action: ecr:GetAuthorizationToken
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;ecr:GetAuthorizationToken
             <br />
-                            Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
           </code>
         </td>
         <td>And some other required actions.</td>
@@ -245,69 +212,69 @@
         <td>3</td>
         <td>
           <code>
-              CodeBuildProject:
+            &nbsp;&nbsp;CodeBuildProject:
             <br />
-                Type: AWS::CodeBuild::Project
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::CodeBuild::Project
             <br />
-                Properties:
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
             <br />
-                  ServiceRole: !Ref CodeBuildServiceRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ServiceRole:&nbsp;!Ref&nbsp;CodeBuildServiceRole
             <br />
-                  Artifacts:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Artifacts:
             <br />
-                    Type: CODEPIPELINE
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;CODEPIPELINE
             <br />
-                  Environment:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Environment:
             <br />
-                    Type: LINUX_CONTAINER
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;LINUX_CONTAINER
             <br />
-                    Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Image:&nbsp;aws/codebuild/amazonlinux2-x86_64-standard:3.0
             <br />
-                    ComputeType: BUILD_GENERAL1_SMALL
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeType:&nbsp;BUILD_GENERAL1_SMALL
           </code>
         </td>
         <td>The CodeBuild project to build the software.</td>
       </tr>
       <tr>
         <td></td>
-        <td><code>        PrivilegedMode: true</code></td>
+        <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrivilegedMode:&nbsp;true</code></td>
         <td>This is required to build Docker image.</td>
       </tr>
       <tr>
         <td></td>
         <td>
           <code>
-                  Source:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source:
             <br />
-                    Type: CODEPIPELINE
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;CODEPIPELINE
             <br />
-                    BuildSpec: !Sub |
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuildSpec:&nbsp;!Sub&nbsp;|
             <br />
-                      version: 0.2
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;version:&nbsp;0.2
             <br />
-                      phases:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;phases:
             <br />
-                        install:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;install:
             <br />
-                          runtime-versions:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime-versions:
             <br />
-                            docker: 19
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;docker:&nbsp;19
             <br />
-                        pre_build:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pre_build:
             <br />
-                          commands:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commands:
             <br />
-                            - echo Logging in to Amazon ECR...
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Logging&nbsp;in&nbsp;to&nbsp;Amazon&nbsp;ECR...
             <br />
-                            - aws --version
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;aws&nbsp;--version
             <br />
-                            - $(aws ecr get-login --region ${AWS::Region} --no-include-email)
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;$(aws&nbsp;ecr&nbsp;get-login&nbsp;--region&nbsp;${AWS::Region}&nbsp;--no-include-email)
             <br />
-                            - REPOSITORY_URI=${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${CodePipelineContainerRegistry}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;REPOSITORY_URI=${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${CodePipelineContainerRegistry}
             <br />
-                            - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;COMMIT_HASH=$(echo&nbsp;$CODEBUILD_RESOLVED_SOURCE_VERSION&nbsp;|&nbsp;cut&nbsp;-c&nbsp;1-7)
             <br />
-                            - IMAGE_TAG=${!COMMIT_HASH:=latest}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;IMAGE_TAG=${!COMMIT_HASH:=latest}
           </code>
         </td>
         <td>The required steps to enable publishing Docker image to the Docker registry.</td>
@@ -316,19 +283,19 @@
         <td></td>
         <td>
           <code>
-                        build:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;build:
             <br />
-                          commands:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commands:
             <br />
-                            - echo Build started on `date`
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Build&nbsp;started&nbsp;on&nbsp;`date`
             <br />
-                            - echo Building the Docker image...
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Building&nbsp;the&nbsp;Docker&nbsp;image...
             <br />
-                            - cd write-it-down-web
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;cd&nbsp;write-it-down-web
             <br />
-                            - npm install
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;npm&nbsp;install
             <br />
-                            - npm run build
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;npm&nbsp;run&nbsp;build
           </code>
         </td>
         <td>The steps to build the software.</td>
@@ -337,19 +304,19 @@
         <td></td>
         <td>
           <code>
-                            - |
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;|
             <br />
-                                cat &gt; Dockerfile &lt;&lt;EOF
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cat&nbsp;&gt;&nbsp;Dockerfile&nbsp;&lt;&lt;EOF
             <br />
-                                FROM nginx
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;nginx
             <br />
-                                COPY build /usr/share/nginx/html/
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COPY&nbsp;build&nbsp;/usr/share/nginx/html/
             <br />
-                                EOF
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EOF
             <br />
-                            - docker build -t $REPOSITORY_URI:latest .
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;docker&nbsp;build&nbsp;-t&nbsp;$REPOSITORY_URI:latest&nbsp;.
             <br />
-                            - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;docker&nbsp;tag&nbsp;$REPOSITORY_URI:latest&nbsp;$REPOSITORY_URI:$IMAGE_TAG
           </code>
         </td>
         <td>Add the Dockerfile dynamically to the project.</td>
@@ -358,17 +325,17 @@
         <td></td>
         <td>
           <code>
-                        post_build:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;post_build:
             <br />
-                          commands:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commands:
             <br />
-                            - echo Build completed on `date`
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Build&nbsp;completed&nbsp;on&nbsp;`date`
             <br />
-                            - echo Pushing the Docker images...
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Pushing&nbsp;the&nbsp;Docker&nbsp;images...
             <br />
-                            - docker push $REPOSITORY_URI:latest
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;docker&nbsp;push&nbsp;$REPOSITORY_URI:latest
             <br />
-                            - docker push $REPOSITORY_URI:$IMAGE_TAG
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;docker&nbsp;push&nbsp;$REPOSITORY_URI:$IMAGE_TAG
           </code>
         </td>
         <td>Push the Docker image to the Docker registry.</td>
@@ -377,9 +344,9 @@
         <td></td>
         <td>
           <code>
-                            - echo Writing image definitions file...
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;echo&nbsp;Writing&nbsp;image&nbsp;definitions&nbsp;file...
             <br />
-                            - printf '[{"name":"WebServer","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG &gt; imagedefinitions.json
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;printf&nbsp;'[{"name":"WebServer","imageUri":"%s"}]'&nbsp;$REPOSITORY_URI:$IMAGE_TAG&nbsp;&gt;&nbsp;imagedefinitions.json
           </code>
         </td>
         <td>Generate the image definition file so AWS knows how to deploy the Docker image.</td>
@@ -388,11 +355,11 @@
         <td></td>
         <td>
           <code>
-                      artifacts:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;artifacts:
             <br />
-                        files: imagedefinitions.json
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;files:&nbsp;imagedefinitions.json
             <br />
-                        base-directory: write-it-down-web
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;base-directory:&nbsp;write-it-down-web
           </code>
         </td>
         <td>Tell the CodeBuild project how to pack the build artifact.</td>
@@ -498,11 +465,11 @@
         <td></td>
         <td>
           <code>
-                          - Resource: !Sub ${WebServerContainerExecutionServerRole.Arn}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${WebServerContainerExecutionServerRole.Arn}
             <br />
-                            Action: iam:PassRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;iam:PassRole
             <br />
-                            Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
           </code>
         </td>
         <td>It needs to pass the role to another service.</td>
@@ -511,15 +478,15 @@
         <td></td>
         <td>
           <code>
-                          - Resource:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:
             <br />
-                              - !Sub ${WebServerContainerCluster.Arn}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Sub&nbsp;${WebServerContainerCluster.Arn}
             <br />
-                              - !Ref WebServerContainerService
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerContainerService
             <br />
-                            Action: ecs:*
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;ecs:*
             <br />
-                            Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
           </code>
         </td>
         <td>It needs to access the container cluster.</td>
@@ -528,17 +495,17 @@
         <td></td>
         <td>
           <code>
-                          - Resource: "*"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;"*"
             <br />
-                            Action:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
             <br />
-                              - ecs:DescribeServices
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecs:DescribeServices
             <br />
-                              - ecs:DescribeTaskDefinition
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecs:DescribeTaskDefinition
             <br />
-                              - ecs:RegisterTaskDefinition
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ecs:RegisterTaskDefinition
             <br />
-                            Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
           </code>
         </td>
         <td>And some other required actions.</td>
@@ -612,33 +579,33 @@
         <td></td>
         <td>
           <code>
-                    - Name: Build
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Build
             <br />
-                      Actions:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actions:
             <br />
-                        - Name: Default
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Default
             <br />
-                          ActionTypeId:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActionTypeId:
             <br />
-                            Category: Build
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Category:&nbsp;Build
             <br />
-                            Owner: AWS
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Owner:&nbsp;AWS
             <br />
-                            Provider: CodeBuild
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Provider:&nbsp;CodeBuild
             <br />
-                            Version: "1"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"1"
             <br />
-                          InputArtifacts:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputArtifacts:
             <br />
-                            - Name: SourceArtifact
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;SourceArtifact
             <br />
-                          OutputArtifacts:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OutputArtifacts:
             <br />
-                            - Name: BuildArtifact
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;BuildArtifact
             <br />
-                          Configuration:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configuration:
             <br />
-                            ProjectName: !Ref CodeBuildProject
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ProjectName:&nbsp;!Ref&nbsp;CodeBuildProject
           </code>
         </td>
         <td>Define the build stage.</td>
@@ -647,31 +614,31 @@
         <td></td>
         <td>
           <code>
-                    - Name: Deploy
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Deploy
             <br />
-                      Actions:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actions:
             <br />
-                        - Name: Default
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Default
             <br />
-                          ActionTypeId:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActionTypeId:
             <br />
-                            Category: Deploy
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Category:&nbsp;Deploy
             <br />
-                            Owner: AWS
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Owner:&nbsp;AWS
             <br />
-                            Provider: ECS
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Provider:&nbsp;ECS
             <br />
-                            Version: "1"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"1"
             <br />
-                          InputArtifacts:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InputArtifacts:
             <br />
-                            - Name: BuildArtifact
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;BuildArtifact
             <br />
-                          Configuration:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configuration:
             <br />
-                            ClusterName: !Ref WebServerContainerCluster
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ClusterName:&nbsp;!Ref&nbsp;WebServerContainerCluster
             <br />
-                            ServiceName: !Ref WebServerContainerService
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ServiceName:&nbsp;!Ref&nbsp;WebServerContainerService
           </code>
         </td>
         <td>Define the deploy stage.</td>
@@ -679,11 +646,8 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>
   Update the stack then you should be able to see the CodePipeline. Execute the pipeline and you should get the software
   built and deployed to the Docker instances.
 </p>
-<!-- /wp:paragraph -->

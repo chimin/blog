@@ -1,55 +1,34 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2021/01/23/aws-cloudformation-04-build-and-deploy-pipeline/">
-    AWS CloudFormation: 04 – Build and deploy pipeline
+    AWS CloudFormation: 04 – Build and deploy&nbsp;pipeline
   </a>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want a web server Docker instance.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>A VPC with 2 subnets because we need to have a load balancer also.</li>
   <li>A load balancer so we can have a fixed endpoint with flexible Docker instances.</li>
   <li>A container cluster to host the Docker web server.</li>
   <li>A container task definition to tell how to run the Docker web server.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":533,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2021/01/template1-designer-1.png?w=1024"
-      alt=""
-      class="wp-image-533"
-    />
+    <img src="/assets/posts/20/template1-designer-1.png" alt="" class="wp-image-533" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong><strong>02-autoscaling-template.yaml</strong></strong>
@@ -57,42 +36,28 @@
   <strong>05-container-webserver-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Unwanted Resources</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We don't need all the resources from the previous YAML file, so we need to do some cleanup first. Delete these
   resources
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:list -->
 <ul>
   <li>WebServerLaunchTemplate</li>
   <li>WebServerAutoScalingGroup</li>
 </ul>
-<!-- /wp:list -->
 
-<!-- wp:paragraph -->
 <p>We don't need the SSH access also, so delete the port 22 from the WebServerSecurityGroup.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Load Balancer</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   The previous load balancer is setup to work with EC2 instances. We need to change it to work with Docker instances.
   Change this resource:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -128,20 +93,14 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Container</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We need to setup to container. We will use AWS Fargate service. It will handle all the Docker services for us. We just
   need to setup the container task definition. Add these resources:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -237,19 +196,12 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Parameters</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We have removed the SSH access to the Docker instance. We don't need any parameters here, so just remove all.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   The URL to the load balancer is available at the Outputs section. Update the stack then you should be able to see the
   NGINX test page with the load balancer URL.
 </p>
-<!-- /wp:paragraph -->

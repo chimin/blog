@@ -1,66 +1,39 @@
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   There are many sophisticated note taking app but I just want a simple one that I can enter some text from my laptop,
   and it will appear in my mobile phone.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What is the plan?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:image {"align":"center","id":143,"sizeSlug":"large"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2020/08/firestore-note-app-1.png?w=534"
-      alt=""
-      class="wp-image-143"
-    />
+    <img src="/assets/posts/7/firestore-note-app-1.png" alt="" class="wp-image-143" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:heading -->
 <h2>
   What is
   <a href="https://firebase.google.com/docs/firestore">Firestore</a>
   ?
 </h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   It's NoSQL database that can automatically sync across different devices. You will immediately see the changes appear
   on other devices.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":144,"sizeSlug":"large"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2020/08/write-it-down-demo.gif?w=1000"
-      alt=""
-      class="wp-image-144"
-    />
+    <img src="/assets/posts/7/write-it-down-demo.gif" alt="" class="wp-image-144" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:heading -->
 <h2>What to do?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:heading {"level":3} -->
 <h3>1. Setup a Firebase project</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Goto
   <a href="https://firebase.google.com/">https://firebase.google.com/</a>
@@ -68,144 +41,80 @@
   <a href="https://console.firebase.google.com/">Firebase console</a>
   and add a project. Go through the wizard pages to add your project.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":146,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image.png?w=395" alt="" class="wp-image-146" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image.png" alt="" class="wp-image-146" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>After that, goto Usage and billing to make sure you are using a free plan so you don't pay for anything.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":164,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-9.png?w=539" alt="" class="wp-image-164" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-9.png" alt="" class="wp-image-164" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Goto Details &amp; settings and modify your plan if it's not Spark plan.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":154,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-5.png?w=1024" alt="" class="wp-image-154" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-5.png" alt="" class="wp-image-154" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Now you can start playing with it without worry.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>2. Setup project settings</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>Goto Project settings.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":157,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-7.png?w=553" alt="" class="wp-image-157" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-7.png" alt="" class="wp-image-157" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Setup the public details for your application.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":158,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-8.png?w=703" alt="" class="wp-image-158" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-8.png" alt="" class="wp-image-158" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:heading {"level":3} -->
 <h3>3. Setup authentication</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We need to setup the authentication so everyone can only see the note they own. Goto Authentication page and enable
   the Google sign-in method.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":155,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-6.png?w=1024" alt="" class="wp-image-155" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-6.png" alt="" class="wp-image-155" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Just enable it and save.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>4. Create the ReactJS web application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>Create an empty directory and run this command:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npx create-react-app write-it-down-web --template typescript</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>To check if your ReactJS web application is working, run this command to start the web server:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm start</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   It should open your browser automatically and you should see a rotating React icon. Now you can exit the browser and
   the web server.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>5. Add login capability to the web application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>First we install the dependencies for Firebase by running this command:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm i firebase firebaseui</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will install the Firebase and the UI to perform the login. Now we add a React Context for storing login related
   details. Put these in
   <strong>./src/contexts/LoggedInContext.ts</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import firebase from 'firebase';
 import React from 'react';
@@ -217,18 +126,14 @@ const LoggedInContext = React.createContext&lt;Partial&lt;{
 
 export default LoggedInContext;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will store the user details and the function to logout the user. Now we add a login page, which will be shown if
   the user is NOT logged in yet. Put these in
   <strong>./src/components/LoginPanel.tsx</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import './LoginPanel.css';
 import '../../node_modules/firebaseui/dist/firebaseui.css';
@@ -265,17 +170,13 @@ const LoginPanel = () =&gt; {
 
 export default LoginPanel;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Now we add some stylings to it. Put these in
   <strong>./src/components/LoginPanel.css</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"css"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 .login-panel {
     position: fixed;
@@ -285,18 +186,14 @@ export default LoginPanel;</pre
     text-align: center;
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will show the title and the login button in the middle of the page. Now we add a dummy home page, which will be
   shown if the user is logged in. Put these in
   <strong>./src/components/HomePanel.tsx</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React, { useContext } from 'react';
 import LoggedInContext from '../contexts/LoggedInContext';
@@ -314,18 +211,14 @@ const HomePage = () =&gt; {
 
 export default HomePage;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will show a title and a logout button. Now we change the entry point to show the corresponding page based on the
   login status. Put these in
   <strong>./src/App.tsx</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import './App.css';
 
@@ -359,65 +252,41 @@ const App = () =&gt; {
 
 export default App;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Lastly, clear the contents of
   <strong>./src/App.css</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>6. Setup Firebase for the web application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   This login capability is not done yet. We need to configure the web application to use the Firebase. Open your
   Firebase console in the browser and go to the project settings. Goto Your apps section and click on the &lt;/&gt;
   button to add a web application.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":171,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-10.png?w=1024" alt="" class="wp-image-171" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-10.png" alt="" class="wp-image-171" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Just fill in the App nickname and click on Register app button.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":173,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-11.png?w=657" alt="" class="wp-image-173" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-11.png" alt="" class="wp-image-173" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Now you should see some Javascript code to setup the Firebase. We just need to
   <strong>firebaseConfig</strong>
   . Copy the content between { and }.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":177,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/08/image-13.png?w=881" alt="" class="wp-image-177" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/7/image-13.png" alt="" class="wp-image-177" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Now open
   <strong>./src/App.tsx</strong>
@@ -425,9 +294,7 @@ export default App;</pre
   <strong>// TODO: Configure Firebase here</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 firebase.initializeApp({
   apiKey: "&lt;from_the_content_copied_just_now&gt;",
@@ -440,29 +307,20 @@ firebase.initializeApp({
   measurementId: "&lt;from_the_content_copied_just_now&gt;"
 });</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   The parameter for the
   <strong>firebase.initializeApp</strong>
   method should be the value you copied just now.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>Now it's done. You can run this command to test everything:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm start</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2020/09/19/make-a-note-taking-app-with-firestore-part-1-2-markdown-editor/">
     Make a note taking app with Firestore – Part 1.2 Markdown&nbsp;editor
   </a>
 </p>
-<!-- /wp:paragraph -->

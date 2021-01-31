@@ -1,4 +1,3 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2021/01/13/aws-cloudformation-02-create-an-auto-scaling-group/">
@@ -6,49 +5,29 @@
   </a>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want to see all the logs in a central place.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>Install CloudWatch agent on the EC2 instances to collect logs.</li>
   <li>Create a S3 bucket to store the logs.</li>
   <li>Create a CloudWatch log group to see the logs.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":471,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2020/12/template1-designer-3.png?w=1024"
-      alt=""
-      class="wp-image-471"
-    />
+    <img src="/assets/posts/18/template1-designer-3.png" alt="" class="wp-image-471" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong><strong>02-autoscaling-template.yaml</strong></strong>
@@ -56,20 +35,14 @@
   <strong>03-cloudwatch-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Launch Template</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   The EC2 instance will need to have permission to post to the CloudWatch logs. We need to attach a IAM Role to the EC2
   instance. Add these to the resources:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -129,13 +102,9 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>Modify these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -346,17 +315,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Logs</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We will create the CloudWatch log group. Add this to the resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -378,17 +341,13 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>
   We can log the events in AWS to the CloudWatch log group also, for example events like AccessDenied. We can see the
   events directly in CloudTrail but logging them to the CloudWatch gives us more flexibility in searching the log
   entries. Add these to the resources:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -533,52 +492,33 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>
   Update the stack then you should be able to see the logs in the CloudWatch. Note that it will take 5 min - 15 min
   before the log entries appear in both CloudTrail and CloudWatch. This is a pain in the ass.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   When the CloudFormation contains IAM Role resources, we need to specifically acknowledge it before the AWS can create
   the resources.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":492,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/12/image-6.png?w=1024" alt="" class="wp-image-492" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/18/image-6.png" alt="" class="wp-image-492" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>When you delete the stack, it will not allow you to do so also if your S3 bucket is not empty.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":495,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/12/image-8.png?w=1024" alt="" class="wp-image-495" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/18/image-8.png" alt="" class="wp-image-495" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>You will have to manually empty the S3 bucket and delete the stack again.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2021/01/23/aws-cloudformation-04-build-and-deploy-pipeline/">
-    AWS CloudFormation: 04 – Build and deploy pipeline
+    AWS CloudFormation: 04 – Build and deploy&nbsp;pipeline
   </a>
   .
 </p>
-<!-- /wp:paragraph -->

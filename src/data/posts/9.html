@@ -1,132 +1,83 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2020/09/19/make-a-note-taking-app-with-firestore-part-1-2-markdown-editor/">
     Make a note taking app with Firestore – Part 1.2 Markdown&nbsp;editor
   </a>
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   A single database is shared by all the users but we want the user only able to access his/her own data. Thus, we need
   to setup the rules for this.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What to do?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:heading {"level":3} -->
 <h3>1. Create the database</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>Open the Firebase console. Goto Cloud Firestore and create a new database.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":204,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/09/image-1.png?w=1014" alt="" class="wp-image-204" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/9/image-1.png" alt="" class="wp-image-204" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Next we have to choose the initial mode for the database. If you are doing some POC, you can start in test mode so it
   allows read/write access by default. We already know what we want to do, so we just choose to start in production
   mode.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":206,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/09/image-2.png?w=1024" alt="" class="wp-image-206" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/9/image-2.png" alt="" class="wp-image-206" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Next choose the physical location of the Firestore database. Choose a location that is closest to you so the
   connection is faster.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":208,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/09/image-3.png?w=1024" alt="" class="wp-image-208" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/9/image-3.png" alt="" class="wp-image-208" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>Now wait for awhile for the database to be created. Then we can craft the rules.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>2. Setup the rules</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>Goto Rules tab and input the rules:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":210,"sizeSlug":"large"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/09/image-4.png?w=1024" alt="" class="wp-image-210" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/9/image-4.png" alt="" class="wp-image-210" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   We have allow the user to access to
   <strong>/users/{user}/**</strong>
   , so the user will not be able to access other people's data because the {user} will always has to match his/her user
   ID. The user is not allowed to access data other than that.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>3. Add navigation to the web application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We will use
   <strong>react-router-dom</strong>
   to add navigation to the web application. We will want to navigate to the document based on an ID in the URL. Run
   these commands to install the library:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 npm i react-router-dom
 npm i -D @types/react-router-dom</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   We will now change the HomePanel to add a sidebar to it so the user can choose the document from a list. Replace
   <strong>./src/components/HomePanel.tsx</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript","highlightLines":"3-9,11,15-17,20,22-25,30-34,37"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import './HomePanel.css';
 
@@ -170,9 +121,7 @@ const HomePanel = () =&gt; {
 
 export default HomePanel;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we update the styling so the sidebar will be stick to the left and the editor will fill the remaining space.
   Replace the
@@ -181,9 +130,7 @@ export default HomePanel;</pre
   <strong>./src/components/HomePanel.css</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"css"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 .sidebar {
     width: 200px;
@@ -213,17 +160,13 @@ export default HomePanel;</pre
     bottom: 0;
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the NewButton. It will create a new document when user click on it. Create
   <strong>./src/components/NewButton.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React from 'react';
 import { useHistory } from "react-router-dom";
@@ -245,17 +188,13 @@ const NewButton = (props: {
 
 export default NewButton;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DeleteButton. It will delete existing document when user click on it. Create
   <strong>./src/components/DeleteButton.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React from 'react';
 import { useParams } from "react-router-dom";
@@ -278,9 +217,7 @@ const DeleteButton = (props: {
 
 export default DeleteButton;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DocList. It will list out all the documents belong to the logged in user. Since it has the
   list of the documents, we will make it navigate to the first available document if the ID in the URL is not correct.
@@ -288,9 +225,7 @@ export default DeleteButton;</pre
   <strong>./src/components/DocList.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
@@ -335,17 +270,13 @@ function compare(a: any, b: any) {
 
 export default DocList;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DocListItem. It is just a link to navigate to the document when user click on it. Create
   <strong>./src/components/DocListItem.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import './DocListItem.css';
 
@@ -369,17 +300,13 @@ const DocListItem = (props: {
 
 export default DocListItem;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   We will need to add some styling to the list item also so it looks nicer. Create
   <strong>./src/components/DocListItem.css</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"css"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 .doc-list-item&gt;a {
     display: block;
@@ -396,25 +323,17 @@ export default DocListItem;</pre
     background: #ddf;
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>Next we will need to change the editor so it load the content from the Firestore.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>4. Update the editor to work on real content</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   First, we replace the
   <strong>./src/components/EditPanel.tsx</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript","highlightLines":"4-5,8-12,16-17,26,28,31,33,35,44"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import '../../node_modules/simplemde/debug/simplemde.css';
 import './EditPanel.css';
@@ -463,18 +382,14 @@ const EditPanel = (props: {
 
 export default EditPanel;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Now it will get the document from Firestore based on the ID in the URL. Next we need to populate the editor content
   from the Firestore document content. Replace
   <strong>// TODO update editor content if Firestore document content changed</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
         const unsubscribeOnSnapshot = docRef.onSnapshot(doc =&gt; {
             if (!doc.metadata.hasPendingWrites) {
@@ -487,9 +402,7 @@ export default EditPanel;</pre
             }
         });</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will subscribe to the snapshot event emitted from the Firestore document whenever the content is changed. It can
   be triggered due to changes from other instances of the web application. Thus the web application can sync the changes
@@ -497,29 +410,21 @@ export default EditPanel;</pre
   the event to make it less CPU intensive. The event handler will update the editor content with the latest Firestore
   document content.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   We will need to unsubscribe from the event when it's not needed anymore. Replace
   <strong>// TODO clean up snapshot listener</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">            unsubscribeOnSnapshot();</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will add event handler to update the Firestore document content when the editor content is changed. Replace
   <strong>// TODO update Firestore document content if editor content changed</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code -->
 <pre class="wp-block-syntaxhighlighter-code">
         editor.codemirror.on('change', async () =&gt; {
             if (!isChangingFromSnapshot) {
@@ -529,9 +434,7 @@ export default EditPanel;</pre
             }
         });</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will subscribe to the change event emitted from the editor. The event handler will update the Firestore document
   content with the editor content. Remember that we update the editor content when the Firestore document content is
@@ -539,17 +442,13 @@ export default EditPanel;</pre
   <strong>isChangingFromSnapshot</strong>
   flag to skip the event handler if it's triggered due to Firestore document content is changed.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will add some helper functions to extract the title from the content. Replace
   <strong>// TODO helper functions</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 function extractTitle(content: string) {
     const match = extractFirstLine(content)?.match(/^[^0-9a-zA-Z]*(.*)$/);
@@ -562,28 +461,19 @@ function extractFirstLine(content: string) {
         .shift();
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>This will extract the first line from the content as the title.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Now you have a note taking web application with sync capability. You can start the web application by running this
   command:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm start</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2020/10/10/make-a-note-taking-app-with-firestore-part-2-1-mobile-application/">
-    Make a note taking app with Firestore – Part 2.1 Mobile application
+    Make a note taking app with Firestore – Part 2.1 Mobile&nbsp;application
   </a>
 </p>
-<!-- /wp:paragraph -->

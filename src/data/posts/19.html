@@ -1,4 +1,3 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2021/01/16/aws-cloudformation-03-collect-logs/">
@@ -6,50 +5,30 @@
   </a>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want to build my software and deploy it to the web server.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>Install CodeDeploy agent on the EC2 instances to deploy new software.</li>
   <li>A CodeBuild setup to build the software.</li>
   <li>A CodeDeploy setup to deploy the software.</li>
   <li>A CodePipeline setup to build and deploy the software.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":505,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2020/12/template1-designer-1-2.png?w=1024"
-      alt=""
-      class="wp-image-505"
-    />
+    <img src="/assets/posts/19/template1-designer-1-2.png" alt="" class="wp-image-505" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong>
@@ -59,17 +38,11 @@
   <strong>04-codepipeline-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Launch Template</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We will need to setup the CodeDeploy agent on the EC2 instances. Modify these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -211,17 +184,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Build and Deploy Pipeline</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We will need to setup a pipeline to build and deploy our software. Add these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -824,17 +791,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Parameters</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We need to add a few parameters to know where is the source code repository. Add these parameters:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -850,12 +811,7 @@
         <td>
           The source code connection string. You can create one with AWS developer tools:
           <br />
-          <img
-            class="wp-image-526"
-            style="width: 500px"
-            src="https://c4compile.files.wordpress.com/2020/12/2020-12-30-18_03_07-.png"
-            alt=""
-          />
+          <img class="wp-image-526" style="width: 500px" src="/assets/posts/19/2020-12-30-18_03_07-.png" alt="" />
         </td>
       </tr>
       <tr>
@@ -874,21 +830,16 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>
   Update the stack then you should be able to see the CodePipeline. Execute the pipeline and you should get the software
   built and deployed to the EC2 instances.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2021/01/30/aws-cloudformation-05-create-a-web-server-docker-instance/">
-    AWS CloudFormation: 05 – Create a web server Docker instance
+    AWS CloudFormation: 05 – Create a web server Docker&nbsp;instance
   </a>
   .
 </p>
-<!-- /wp:paragraph -->

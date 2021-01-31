@@ -1,16 +1,9 @@
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want a web server.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>
     A subnet with CIDR block of 10.0.0.0/24 so my web server instances will always fall in a predefined range, then I
@@ -21,61 +14,41 @@
   <li>A security group so only certain ports are exposed to the world.</li>
   <li>A EC2 instance which is hosting my web server.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":425,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/12/image.png?w=1024" alt="" class="wp-image-425" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/16/image.png" alt="" class="wp-image-425" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   We will use CloudFormation to do it. Create a
   <strong>01-webserver-template.yaml</strong>
   file with these contents:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code -->
 <pre class="wp-block-syntaxhighlighter-code">
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
 Parameters:
 Outputs:</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This is the basic structure of a CloudFormation file. It can be a JSON file or a YAML file. I'm using YAML format
   here.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Network</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   First we setup the VPC for our web servers. Add these to the
   <strong>Resources</strong>
   section:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -201,21 +174,15 @@ Outputs:</pre
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Web server</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Next we setup the EC2 instances to run a web server. Add these to the
   <strong>Resources</strong>
   section:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -296,7 +263,7 @@ Outputs:</pre
           <img
             class="wp-image-419"
             style="width: 500px"
-            src="https://c4compile.files.wordpress.com/2020/12/2020-12-29-16_23_02-launch-instance-wizard-_-ec2-management-console-personal-microsofte2808b-edge.png"
+            src="/assets/posts/16/2020-12-29-16_23_02-launch-instance-wizard-_-ec2-management-console-personal-microsofte2808b-edge.png"
             alt=""
           />
         </td>
@@ -375,21 +342,15 @@ Outputs:</pre
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Parameters</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Add these to the
   <strong>Parameters</strong>
   section:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -424,7 +385,7 @@ Outputs:</pre
           <img
             class="wp-image-435"
             style="width: 500px"
-            src="https://c4compile.files.wordpress.com/2020/12/2020-12-29-16_35_33-key-pairs-_-ec2-management-console-personal-microsofte2808b-edge-1.png"
+            src="/assets/posts/16/2020-12-29-16_35_33-key-pairs-_-ec2-management-console-personal-microsofte2808b-edge-1.png"
             alt=""
           />
         </td>
@@ -432,25 +393,15 @@ Outputs:</pre
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>The AWS console will prompt you the parameter when you upload your template:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":430,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/12/image-1.png?w=1017" alt="" class="wp-image-430" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/16/image-1.png" alt="" class="wp-image-430" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Output</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   After provision all the components, we want to have the public IP of the web server instance so we can access it from
   the Internet. CloudFormation allows us to bind the properties of a component as an output so we don't have to dig
@@ -458,9 +409,7 @@ Outputs:</pre
   <strong>Output</strong>
   section:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -480,40 +429,27 @@ Outputs:</pre
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>The AWS console will show all the outputs here:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":439,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
-  <figure class="aligncenter size-large">
-    <img src="https://c4compile.files.wordpress.com/2020/12/image-5.png?w=960" alt="" class="wp-image-439" />
-  </figure>
+  <figure class="aligncenter size-large"><img src="/assets/posts/16/image-5.png" alt="" class="wp-image-439" /></figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open the URL in a browser and you should see the NGINX welcome page. It might takes a while for the page to work
   because it takes time to spin up an EC2 instance.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   You can delete the stack after you done playing with it. It will delete all the resources belong to this
   CloudFormation stack. Squishy clean.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2021/01/13/aws-cloudformation-02-create-an-auto-scaling-group/">
-    AWS CloudFormation: 02 – Create an auto scaling group
+    AWS CloudFormation: 02 – Create an auto scaling&nbsp;group
   </a>
   .
 </p>
-<!-- /wp:paragraph -->

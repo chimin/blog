@@ -1,54 +1,37 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2020/10/10/make-a-note-taking-app-with-firestore-part-2-1-mobile-application/">
-    Make a note taking app with Firestore – Part 2.1 Mobile application
+    Make a note taking app with Firestore – Part 2.1 Mobile&nbsp;application
   </a>
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Web application is using an open source Markdown editor but I can't find a similar component for React Native. Thus
   the mobile application will only use a normal text editor. Markdown content is nicely formatted even if it's just
   displayed in plain text.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What to do?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:heading {"level":3} -->
 <h3>1. Add navigation to the mobile application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   We will use
   <strong>@react-navigation</strong>
   to add navigation to the mobile application. Run these commands to install the library:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm i @react-navigation/native @react-navigation/stack</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   We will change the HomePanel to show a document list if a document is not selected, and a text editor if a document is
   selected. Replace
   <strong>./src/components/HomePanel.tsx</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"highlightLines":"1-4,6-9,11,15-16,23-36"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import firestore from '@react-native-firebase/firestore';
 import { NavigationContainer } from '@react-navigation/native';
@@ -91,17 +74,13 @@ const HomePanel = () =&gt; {
 
 export default HomePanel;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the LogoutButton. It will logout the current user when user click on it. Create
   <strong>./src/components/LogoutButton.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React, { useContext } from 'react';
 import LoggedInContext from '../contexts/LoggedInContext';
@@ -119,17 +98,13 @@ const LogoutButton = () =&gt; {
 
 export default LogoutButton;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the NewButton. It will create a new document when user click on it. Create
   <strong>./src/components/NewButton.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React from 'react';
 import { Button } from 'react-native';
@@ -151,16 +126,12 @@ const NewButton = (props: {
 
 export default NewButton;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DeleteButton. It will delete existing document when user click on it. This will be shown in
   the editor screen. Create ./src/components/DeleteButton.tsx and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React from 'react';
 import { Button, Alert } from 'react-native';
@@ -193,17 +164,13 @@ const DeleteButton = (props: {
 
 export default DeleteButton;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DocList. It will list out all the documents belong to the logged in user. Create
   <strong>./src/components/DocList.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React, { useState, useEffect } from 'react';
 import DocListItem from './DocListItem';
@@ -235,18 +202,14 @@ function compare(a: any, b: any) {
 
 export default DocList;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will implement the DocListItem. It is just a touchable component to open the editor for the selected document
   when user click on it. Create
   <strong>./src/components/DocListItem.tsx</strong>
   and put these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React from 'react';
 import { Text, TouchableHighlight, View } from 'react-native';
@@ -275,21 +238,15 @@ const DocListItem = (props: {
 
 export default DocListItem;</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:heading {"level":3} -->
 <h3>2. Add editor to the mobile application</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   First, we create
   <strong>./src/components/EditPanel.tsx</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -344,17 +301,13 @@ const EditPanel = (props: {
 
 export default EditPanel;
 </pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   Next we need to populate the editor content from the Firestore document content. Replace
   <strong>// TODO update editor content if Firestore document content changed</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
     useEffect(() =&gt; {
         let timer: any;
@@ -374,9 +327,7 @@ export default EditPanel;
         };
     }, [docRef]);</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will subscribe to the snapshot event emitted from the Firestore document whenever the content is changed. It can
   be triggered due to changes from other instances of the web application. Thus the web application can sync the changes
@@ -386,17 +337,13 @@ export default EditPanel;
   <strong>useEffect</strong>
   hook will unsubscribe the event when it's not needed anymore.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will add event handler to update the Firestore document content when the editor content is changed. Replace
   <strong>// TODO update Firestore document content if editor content changed</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
     const onChangeText = async (newContent: string) =&gt; {
         if (!isChangingFromSnapshot) {
@@ -406,9 +353,7 @@ export default EditPanel;
         }
     };</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   This will create an event handler for the change text event emitted from the editor. The event handler will update the
   Firestore document content with the editor content. Remember that we update the editor content when the Firestore
@@ -416,17 +361,13 @@ export default EditPanel;
   <strong>isChangingFromSnapshot</strong>
   flag to skip the event handler if it's triggered due to Firestore document content is changed.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will add some helper functions to extract the title from the content. Replace
   <strong>// TODO helper functions</strong>
   with these:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">
 function extractTitle(content: string) {
     const match = extractFirstLine(content)?.match(/^[^0-9a-zA-Z]*(.*)$/);
@@ -439,27 +380,18 @@ function extractFirstLine(content: string) {
         .shift();
 }</pre
 >
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>This will extract the first line from the content as the title.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Now you have a note taking mobile application with sync capability. You can start the mobile application by running
   this command:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
 <pre class="wp-block-syntaxhighlighter-code">npm run android</pre>
-<!-- /wp:syntaxhighlighter/code -->
 
-<!-- wp:paragraph -->
 <p>
   The full source code is available at
   <a href="https://github.com/chimin/write-it-down">https://github.com/chimin/write-it-down</a>
   .
 </p>
-<!-- /wp:paragraph -->

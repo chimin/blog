@@ -1,4 +1,3 @@
-<!-- wp:paragraph -->
 <p>
   This is continued from
   <a href="https://c4compile.me/2020/12/29/aws-cloudformation-01-create-a-web-server-ec2-instance/">
@@ -6,49 +5,29 @@
   </a>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want to scale my web server horizontally.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>A launch template to launch an EC2 instance when needed.</li>
   <li>A load balancer to route traffic to multiple EC2 instances.</li>
   <li>A auto scaling group to control the amount of running EC2 instances.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":449,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2020/12/template1-designer-1.png?w=1024"
-      alt=""
-      class="wp-image-449"
-    />
+    <img src="/assets/posts/17/template1-designer-1.png" alt="" class="wp-image-449" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong>01-webserver-template.yaml</strong>
@@ -56,20 +35,14 @@
   <strong>02-autoscaling-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Network</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   The load balancer requires multiple subnets, thus we need to create another subnet for our VPC. Modify these
   resources:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -97,13 +70,9 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>Then add these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -146,13 +115,9 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Launch Template</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   The auto scaling group will need to know how to launch an EC2 instance. This is defined as launch template in AWS. The
   structure is very similar to how we define the EC2 instance in last port. Modify
@@ -161,9 +126,7 @@
   <strong>WebServerLaunchTemplate</strong>
   :
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -248,17 +211,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Load Balancer</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>The load balancer will route the traffic from the Internet to the EC2 instances. Add these resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -364,20 +321,14 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Auto Scaling Group</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   The auto scaling group will change the number of running EC2 instances on the fly. It can do that manually or through
   some predefined condition (aka auto scaling). Add this to the resources:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -441,20 +392,14 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Output</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   There are multiple EC2 instances now so we can't rely on the IP of the EC2 instances to access our web server. We need
   to use the DNS name of the load balancer. Change the outputs to this:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -472,28 +417,21 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>
   You can update the stack created in previous post with this stack. The CloudFormation will figure out the changes and
   know how to modify the existing resources and provision new resources.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Open the URL in a browser and you should see the NGINX welcome page. It might takes a while for the page to work
   because it takes time to spin up the EC2 instance.
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
 <p>
   Next we will do
   <a href="https://c4compile.me/2021/01/16/aws-cloudformation-03-collect-logs/">
-    AWS CloudFormation: 03 – Collect logs
+    AWS CloudFormation: 03 – Collect&nbsp;logs
   </a>
   .
 </p>
-<!-- /wp:paragraph -->

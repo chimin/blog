@@ -1,47 +1,26 @@
-<!-- wp:paragraph -->
 <p>This is continued from xxx.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>Background</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>I want to see all the logs in a central place.</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading -->
 <h2>What we need?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:list {"ordered":true} -->
 <ol>
   <li>Setup container task definition to collect logs.</li>
   <li>Create a CloudWatch log group to see the logs.</li>
 </ol>
-<!-- /wp:list -->
 
-<!-- wp:heading -->
 <h2>How to do it?</h2>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>This is what we are going to do:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center","id":547,"sizeSlug":"large","linkDestination":"none"} -->
 <div class="wp-block-image">
   <figure class="aligncenter size-large">
-    <img
-      src="https://c4compile.files.wordpress.com/2021/01/template1-designer-2.png?w=1024"
-      alt=""
-      class="wp-image-547"
-    />
+    <img src="/assets/posts/21/template1-designer-2.png" alt="" class="wp-image-547" />
   </figure>
 </div>
-<!-- /wp:image -->
 
-<!-- wp:paragraph -->
 <p>
   Open
   <strong>
@@ -51,20 +30,14 @@
   <strong>06-container-cloudwatch-template.yaml</strong>
   .
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Container</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>
   Collecting logs from a Docker instance is much easier than collecting logs from a EC2 instance because we don't need
   to find out where's the log file. Just change this resource:
 </p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -72,34 +45,34 @@
         <td>1</td>
         <td>
           <code>
-              WebServerContainerTaskDefinition:
+            &nbsp;&nbsp;WebServerContainerTaskDefinition:
             <br />
-                Type: AWS::ECS::TaskDefinition
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::ECS::TaskDefinition
             <br />
-                Properties:
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
             <br />
-                  ContainerDefinitions:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ContainerDefinitions:
             <br />
-                    - Name: WebServer
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;WebServer
             <br />
-                      Image: nginx
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Image:&nbsp;nginx
             <br />
-                      PortMappings:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PortMappings:
             <br />
-                        - ContainerPort: 80
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;ContainerPort:&nbsp;80
             <br />
             <span class="has-inline-color has-vivid-green-cyan-color">
-                        LogConfiguration:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LogConfiguration:
               <br />
-                          LogDriver: awslogs
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LogDriver:&nbsp;awslogs
               <br />
-                          Options:
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Options:
               <br />
-                            awslogs-group: !Ref CloudWatchLogGroup
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;awslogs-group:&nbsp;!Ref&nbsp;CloudWatchLogGroup
               <br />
-                            awslogs-region: !Sub ${AWS::Region}
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;awslogs-region:&nbsp;!Sub&nbsp;${AWS::Region}
               <br />
-                            awslogs-stream-prefix: nginx
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;awslogs-stream-prefix:&nbsp;nginx
             </span>
           </code>
         </td>
@@ -109,18 +82,18 @@
         <td></td>
         <td>
           <code>
-                  RequiresCompatibilities:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RequiresCompatibilities:
             <br />
-                    - FARGATE
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;FARGATE
             <br />
-                  NetworkMode: awsvpc
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetworkMode:&nbsp;awsvpc
             <br />
-                  Cpu: 256
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cpu:&nbsp;256
             <br />
-                  Memory: 512
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Memory:&nbsp;512
             <br />
             <span class="has-inline-color has-vivid-green-cyan-color">
-                    ExecutionRoleArn: !Sub ${WebServerContainerExecutionServerRole.Arn}
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExecutionRoleArn:&nbsp;!Sub&nbsp;${WebServerContainerExecutionServerRole.Arn}
             </span>
           </code>
         </td>
@@ -129,13 +102,9 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>And add this resource:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -143,43 +112,43 @@
         <td>1</td>
         <td>
           <code>
-              WebServerContainerExecutionServerRole:
+            &nbsp;&nbsp;WebServerContainerExecutionServerRole:
             <br />
-                Type: AWS::IAM::Role
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
             <br />
-                Properties:
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
             <br />
-                  AssumeRolePolicyDocument:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssumeRolePolicyDocument:
             <br />
-                    Version: "2012-10-17"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
             <br />
-                    Statement:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
             <br />
-                      - Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
             <br />
-                        Principal:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
             <br />
-                          Service: ecs-tasks.amazonaws.com
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;ecs-tasks.amazonaws.com
             <br />
-                        Action:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
             <br />
-                          - sts:AssumeRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;sts:AssumeRole
             <br />
-                  Policies:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies:
             <br />
-                    - PolicyName: WebServerContainerExecutionServiceRole
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;PolicyName:&nbsp;WebServerContainerExecutionServiceRole
             <br />
-                      PolicyDocument:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
             <br />
-                        Version: "2012-10-17"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
             <br />
-                        Statement:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
             <br />
-                          - Effect: Allow
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
             <br />
-                            Resource: !Sub ${CloudWatchLogGroup.Arn}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Resource:&nbsp;!Sub&nbsp;${CloudWatchLogGroup.Arn}
             <br />
-                            Action: logs:*
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;logs:*
           </code>
         </td>
         <td>IAM Role that allow the Docker instance to post to CloudWatch log group.</td>
@@ -187,17 +156,11 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:heading {"level":3} -->
 <h3>Logs</h3>
-<!-- /wp:heading -->
 
-<!-- wp:paragraph -->
 <p>We will create the CloudWatch log group. Add this to the resources:</p>
-<!-- /wp:paragraph -->
 
-<!-- wp:table -->
 <figure class="wp-block-table">
   <table>
     <tbody>
@@ -219,8 +182,5 @@
     </tbody>
   </table>
 </figure>
-<!-- /wp:table -->
 
-<!-- wp:paragraph -->
 <p>Update the stack then you should be able to see the logs in the CloudWatch.</p>
-<!-- /wp:paragraph -->
