@@ -1,0 +1,226 @@
+<!-- wp:paragraph -->
+<p>This is continued from xxx.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want to see all the logs in a central place.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What we need?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Setup container task definition to collect logs.</li>
+  <li>Create a CloudWatch log group to see the logs.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This is what we are going to do:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":547,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img
+      src="https://c4compile.files.wordpress.com/2021/01/template1-designer-2.png?w=1024"
+      alt=""
+      class="wp-image-547"
+    />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong>
+    <strong><strong>05-container-webserver-template.yaml</strong></strong>
+  </strong>
+  from previous post and save as
+  <strong>06-container-cloudwatch-template.yaml</strong>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Container</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Collecting logs from a Docker instance is much easier than collecting logs from a EC2 instance because we don't need
+  to find out where's the log file. Just change this resource:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+              WebServerContainerTaskDefinition:
+            <br />
+                Type: AWS::ECS::TaskDefinition
+            <br />
+                Properties:
+            <br />
+                  ContainerDefinitions:
+            <br />
+                    - Name: WebServer
+            <br />
+                      Image: nginx
+            <br />
+                      PortMappings:
+            <br />
+                        - ContainerPort: 80
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+                        LogConfiguration:
+              <br />
+                          LogDriver: awslogs
+              <br />
+                          Options:
+              <br />
+                            awslogs-group: !Ref CloudWatchLogGroup
+              <br />
+                            awslogs-region: !Sub ${AWS::Region}
+              <br />
+                            awslogs-stream-prefix: nginx
+            </span>
+          </code>
+        </td>
+        <td>Add the log configuration to the task definition.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                  RequiresCompatibilities:
+            <br />
+                    - FARGATE
+            <br />
+                  NetworkMode: awsvpc
+            <br />
+                  Cpu: 256
+            <br />
+                  Memory: 512
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+                    ExecutionRoleArn: !Sub ${WebServerContainerExecutionServerRole.Arn}
+            </span>
+          </code>
+        </td>
+        <td>Associate it with a IAM Role that can post to CloudWatch log group.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>And add this resource:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+              WebServerContainerExecutionServerRole:
+            <br />
+                Type: AWS::IAM::Role
+            <br />
+                Properties:
+            <br />
+                  AssumeRolePolicyDocument:
+            <br />
+                    Version: "2012-10-17"
+            <br />
+                    Statement:
+            <br />
+                      - Effect: Allow
+            <br />
+                        Principal:
+            <br />
+                          Service: ecs-tasks.amazonaws.com
+            <br />
+                        Action:
+            <br />
+                          - sts:AssumeRole
+            <br />
+                  Policies:
+            <br />
+                    - PolicyName: WebServerContainerExecutionServiceRole
+            <br />
+                      PolicyDocument:
+            <br />
+                        Version: "2012-10-17"
+            <br />
+                        Statement:
+            <br />
+                          - Effect: Allow
+            <br />
+                            Resource: !Sub ${CloudWatchLogGroup.Arn}
+            <br />
+                            Action: logs:*
+          </code>
+        </td>
+        <td>IAM Role that allow the Docker instance to post to CloudWatch log group.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Logs</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We will create the CloudWatch log group. Add this to the resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudWatchLogGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::Logs::LogGroup
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RetentionInDays:&nbsp;3
+          </code>
+        </td>
+        <td>The log group for CloudWatch. The log entries will be automatically deleted in 3 days.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Update the stack then you should be able to see the logs in the CloudWatch.</p>
+<!-- /wp:paragraph -->

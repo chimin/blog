@@ -1,0 +1,630 @@
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The world is full of virus now. We should just stay at home but it's boring. I want to have an application that allow
+  me to
+  <a href="https://thesmoodiaries.com/canto-slang-blow-water/">blow water</a>
+  with my friends with video.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What is the plan?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Make a web application for video conference.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>How to start?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The browser has became a super sophisticated software that has all sort of functions inside. By using just
+  &lt;video&gt; tag then you can have a video player in your web application. I will use these to make the web
+  application.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":65,"sizeSlug":"large"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/06/untitled-diagram-1.png?w=441" alt="" class="wp-image-65" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td><strong>Browser Application</strong></td>
+        <td>
+          This is the thing you see when you typed in
+          <strong>http://www.something.com</strong>
+          in your browser address bar.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Signaling Server</strong></td>
+        <td>To exchange handshake message to initiate the video call.</td>
+      </tr>
+      <tr>
+        <td><strong>STUN Server</strong></td>
+        <td>To discover the public IP of the user machine so others can connect to it.</td>
+      </tr>
+      <tr>
+        <td><strong>TURN Server</strong></td>
+        <td>
+          Everyone is behind a router nowadays. Direct connection won't be possible. This server will relay the traffic
+          between the user machine.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading -->
+<h2>What to do?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Signaling Server</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>1. Setup Webpack</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  I like Typescript so I use Typescript whenever I can. First install
+  <a href="https://www.npmjs.com/">npm</a>
+  on your machine, then setup a Webpack + Typescript project from scratch by running these commands in an empty
+  directory:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+echo {} &gt; package.json
+npm i -D webpack webpack-cli typescript ts-loader @types/node</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will install Webpack + Typescript for your project.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we setup Webpack by creating the ./
+  <strong>webpack.config.js</strong>
+  file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+const path = require('path');
+
+module.exports = {
+    entry: './src/main.ts',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
+    output: {
+        filename: 'main.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    target: 'node',
+    devtool: 'source-map'
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will setup the Webpack to compile
+  <strong>./src/main.ts</strong>
+  into
+  <strong>./dist/main.js</strong>
+  . The source-map is useful if you want the stack trace to show details on the original .ts file instead of the
+  generated .js file.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Next we create an empty ./tsconfig.json because Webpack needs it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">{ }</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we setup the
+  <strong>./package.json</strong>
+  to run the output script then doing
+  <strong>npm start</strong>
+  command. Add these to the file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+    ...
+    "scripts": {
+        "start": "node ./dist/main.js"
+    },
+    ...
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Now the setup is done. Next we just do a little check to make sure everything is really working. Create
+  <strong>./src/main.ts</strong>
+  and put in some random code.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">console.log('Hello Webpack!');</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>Run this command to build the project:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">npx webpack</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>Run this command to run the project:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">npm start</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  You should see
+  <strong>Hello Webpack!</strong>
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2. Write a HTTP server</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The signaling server is a WebSocket server, which is based on a HTTP server. So first we write a HTTP server. NodeJS
+  has everything ready. It's very simple to do that. You can use
+  <a href="https://www.npmjs.com/package/express">express</a>
+  to write a better HTTP server but I will just do a simple one here with builtin functions from NodeJS. Create
+  <strong>./src/main.ts</strong>
+  and write these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import * as http from 'http';
+
+const server = http.createServer((request, response) =&gt; {
+    // TODO handle-http-request
+});
+server.listen(8080);
+
+// TODO implement-websocket-server
+
+console.log('Server started');</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The HTTP server is created to listen to port 8080. There's no MVC framework here so you will need to handle everything
+  by your own. It's enough to my use. I want the HTTP server to be able to serve the files for my browser application. I
+  need to helper library to determine the mime type from the file name because the browser will need it when receiving
+  the file from the HTTP server. Install
+  <a href="https://www.npmjs.com/package/mime-type">mime-type</a>
+  library with this commands:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+npm i mime-types
+npm i @types/mime-types -D</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Add the import to the top of
+  <strong>./src/main.ts</strong>
+  file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import * as fs from 'fs';
+import * as mime from 'mime-types';</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then replace the
+  <strong>// TODO handle-http-request</strong>
+  block with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+    const path = 'web' + request.url;
+    if (fs.existsSync(path)) {
+        const stat = fs.statSync(path);
+        const actualPath = stat.isDirectory() ? path + '/index.html' : path;
+        response.writeHead(200, { 'Content-Type': mime.lookup(actualPath).toString() });
+        response.end(fs.readFileSync(actualPath));
+    } else {
+        response.writeHead(404);
+        response.end();
+    }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Serve files from
+    <strong>./web</strong>
+    directory.
+  </li>
+  <li>Return the file content as response if the path points to a valid file.</li>
+  <li>
+    Return the file content of
+    <strong>&lt;path&gt;/index.html</strong>
+    if the path points to a valid directory.
+  </li>
+  <li>Otherwise return HTTP status 404, which means resource not found.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  To make sure everything is really working, create
+  <strong>./web/index.html</strong>
+  file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"xml"} -->
+<pre class="wp-block-syntaxhighlighter-code">&lt;html&gt;&lt;body&gt;Hello HTTP server!&lt;/body&gt;&lt;/html&gt;</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Build the project and start it. Open
+  <strong>http://localhost:8080</strong>
+  in your browser. You should be able to see
+  <strong>Hello HTTP server!</strong>
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>If you want the Webpack to automatically rebuild when there's file changes, run this command:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">npx webpack --watch</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will not restart the server if you already started it. You will need to restart the server manually.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>3. Write A Websocket Server</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  I use
+  <a href="https://www.npmjs.com/package/websocket">websocket</a>
+  library to implement the WebSocket server. First, install the library with these commands:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+npm i websocket
+npm i @types/websocket -D</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Add the import to the top of
+  <strong>./src/main.ts</strong>
+  file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">import { server as WebSocketServer, connection } from 'websocket';</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Replace the
+  <strong>// TODO implement-websocket-server</strong>
+  with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+const wsSessions: { [room: string]: { [id: string]: connection } } = {};
+let sessionIdCounter = 0;
+
+const wsServer = new WebSocketServer({
+    httpServer: server,
+    autoAcceptConnections: false
+});
+wsServer.on('request', request =&gt; {
+    // TODO handle-new-websocket-connection
+});</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Create a room list to store WebSocket sessions for each room. I have to be able to have private blow water session
+    with my friends so I want a room.
+  </li>
+  <li>Create a counter for session ID so I can assign an unique ID to each WebSocket session.</li>
+  <li>Create a WebSocket on top of the HTTP server created previously.</li>
+  <li>Do something when there's a new incoming WebSocket connection.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we write code to handle the new incoming WebSocket connection. Replace
+  <strong>// TODO handle-new-websocket-connection</strong>
+  block with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+    const pathMatch = request.resource.match(/^\/room\/([^\/]+)$/);
+    if (!pathMatch) {
+        request.reject(404);
+        return;
+    }
+
+    const room = pathMatch[1];
+    if (!wsSessions[room]) {
+        wsSessions[room] = {};
+    }
+
+    const ws = request.accept();
+    const sessionId = ++sessionIdCounter;
+    wsSessions[room][sessionId] = ws;
+    
+    // TODO handle-websocket-open
+
+    ws.on('message', message =&gt; {
+        // TODO handle-websocket-message
+    });
+    
+    ws.on('close', () =&gt; {
+        // TODO handle-websocket-close
+    });</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Only accept the WebSocket connection if the path is
+    <strong>/room/{roomId}</strong>
+    .
+  </li>
+  <li>Create a room in the WebSocket session list.</li>
+  <li>Assign an unique ID to the WebSocket session.</li>
+  <li>Store the WebSocket session in the room.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  To make sure everything is working fine, we need to install a WebSocket client to check it. I use
+  <a
+    href="https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo/related?hl=en"
+  >
+    Simple WebSocket Client
+  </a>
+  browser extension to do it. First, we make the Websocket to send something so we know it's working. Replace the
+  <strong>// TODO handle-websocket-open</strong>
+  block with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">    ws.send('Hello WebSocket server!')</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Build the project and start it. Connect to
+  <strong>ws://localhost:8080/room/123</strong>
+  and you should see
+  <strong>Hello WebSocker server!</strong>
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Revert the changes after done testing.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>4. Handle participant joining and participant leaving</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  To handle participant joining, replace
+  <strong>// TODO handle-websocket-open</strong>
+  block with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+    ws.send(JSON.stringify({
+        type: 'participant-list',
+        you: sessionId,
+        all: Object.keys(wsSessions[room]),
+    }));</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will send the ID of all participants in the room to the connecting client. It will also send the ID of the
+  connecting client so he/she knows who he/she is.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  To handle participant leaving, replace
+  <strong>// TODO handle-websocket-close</strong>
+  block with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+        delete wsSessions[room][sessionId];
+        const message = JSON.stringify({
+            type: 'participant-leave',
+            from: sessionId,
+        });
+        Object.values(wsSessions[room]).forEach(s =&gt; s.send(message));</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Remove the WebSocket session from the room.</li>
+  <li>Tell everyone this participant is leaving.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":4} -->
+<h4>5. Handle other messages</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The server will not care about other messages. It will just pass it to the target participant or to everyone depends
+  on the
+  <strong>to</strong>
+  field in the JSON payload. The browser application will handle it. Replace
+  <strong>// TODO handle-websocket-message</strong>
+  with this code:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+        if (message.type == 'utf8') {
+            const command = JSON.parse(message.utf8Data) as { to?: string };
+            if (command.to) {
+                if (wsSessions[room][command.to]) {
+                    wsSessions[room][command.to].send(message.utf8Data);
+                }
+            } else {
+                Object.values(wsSessions[room]).forEach(s =&gt; s.send(message.utf8Data));
+            }
+        }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Only handle text message. WebSocket is capable to transfer text message and binary message.</li>
+  <li>
+    If there's value in the
+    <strong>to</strong>
+    field of the JSON payload, send it only to the specific participant.
+  </li>
+  <li>Otherwise, send it to everyone.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>That's it for the signaling server. You can use a WebSocket client to test it out.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next I will talk about the
+  <a href="https://c4compile.me/2020/07/05/make-a-video-conference-web-application-part-2-browser-application/">
+    browser application
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

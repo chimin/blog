@@ -1,0 +1,689 @@
+<!-- wp:paragraph -->
+<p>This is continued from xxx.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want to build my software and deploy it to the Docker instance.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What we need?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>A Docker registry to store the Docker images.</li>
+  <li>A CodeBuild setup to build the software.</li>
+  <li>A CodeDeploy setup to deploy the software.</li>
+  <li>A CodePipeline setup to build and deploy the software.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This is what we are going to do:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":559,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img
+      src="https://c4compile.files.wordpress.com/2021/01/template1-designer-3-1.png?w=1024"
+      alt=""
+      class="wp-image-559"
+    />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong>
+    <strong><strong>06-container-cloudwatch-template.yaml</strong></strong>
+  </strong>
+  from previous post and save as
+  <strong>07-container-codepipeline-template.yaml</strong>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Container</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We need to add the policy to allow the container service to grab the images from our new Docker registry. Change the
+  WebServerContainerExecutionServerRole like this:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+              WebServerContainerExecutionServerRole:
+            <br />
+                Type: AWS::IAM::Role
+            <br />
+                Properties:
+            <br />
+            ...
+            <br />
+                  Policies:
+            <br />
+                    - PolicyName: WebServerContainerExecutionServiceRole
+            <br />
+                      PolicyDocument:
+            <br />
+                        Version: "2012-10-17"
+            <br />
+                        Statement:
+            <br />
+            ...
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+                            - Resource: !Sub ${CodePipelineContainerRegistry.Arn}
+              <br />
+                              Action: ecr:*
+              <br />
+                              Effect: Allow
+            </span>
+          </code>
+        </td>
+        <td>Add the policy to access the Docker registry.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+                            - Resource: "*"
+              <br />
+                              Action:
+              <br />
+                                - ecr:GetAuthorizationToken
+              <br />
+                                - ecs:DeregisterTaskDefinition
+              <br />
+                                - ecs:RegisterTaskDefinition
+              <br />
+                              Effect: Allow
+            </span>
+          </code>
+        </td>
+        <td>Add the policy for other required actions.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Build and Deploy Pipeline</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We will need to setup a pipeline to build and deploy our software. Add these resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+              CodePipelineContainerRegistry:
+            <br />
+                Type: AWS::ECR::Repository
+          </code>
+        </td>
+        <td>The Docker registry to store the Docker images.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CodePipelineBucket:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::S3::Bucket
+          </code>
+        </td>
+        <td>The S3 bucket to store the source artifacts.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>
+          <code>
+              CodeBuildServiceRole:
+            <br />
+                Type: AWS::IAM::Role
+            <br />
+                Properties:
+            <br />
+                  AssumeRolePolicyDocument:
+            <br />
+                    Version: "2012-10-17"
+            <br />
+                    Statement:
+            <br />
+                      - Effect: Allow
+            <br />
+                        Principal:
+            <br />
+                          Service: codebuild.amazonaws.com
+            <br />
+                        Action:
+            <br />
+                          - sts:AssumeRole
+            <br />
+                  Policies:
+            <br />
+                    - PolicyName: CodeBuildServicePolicy
+            <br />
+                      PolicyDocument:
+            <br />
+                        Version: "2012-10-17"
+            <br />
+                        Statement:
+            <br />
+                          - Resource:
+            <br />
+                              - !Sub ${CodePipelineBucket.Arn}
+            <br />
+                              - !Sub ${CodePipelineBucket.Arn}/*
+            <br />
+                            Action: s3:*
+            <br />
+                            Effect: Allo
+          </code>
+          w
+        </td>
+        <td>The IAM Role to allow the CodeBuild project to access the S3 bucket.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                          - Resource: !Sub ${CodePipelineContainerRegistry.Arn}
+            <br />
+                            Action: ecr:*
+            <br />
+                            Effect: Allow
+          </code>
+        </td>
+        <td>And the Docker registry.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                          - Resource: "*"
+            <br />
+                            Action: ecr:GetAuthorizationToken
+            <br />
+                            Effect: Allow
+          </code>
+        </td>
+        <td>And some other required actions.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>
+          <code>
+              CodeBuildProject:
+            <br />
+                Type: AWS::CodeBuild::Project
+            <br />
+                Properties:
+            <br />
+                  ServiceRole: !Ref CodeBuildServiceRole
+            <br />
+                  Artifacts:
+            <br />
+                    Type: CODEPIPELINE
+            <br />
+                  Environment:
+            <br />
+                    Type: LINUX_CONTAINER
+            <br />
+                    Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+            <br />
+                    ComputeType: BUILD_GENERAL1_SMALL
+          </code>
+        </td>
+        <td>The CodeBuild project to build the software.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>        PrivilegedMode: true</code></td>
+        <td>This is required to build Docker image.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                  Source:
+            <br />
+                    Type: CODEPIPELINE
+            <br />
+                    BuildSpec: !Sub |
+            <br />
+                      version: 0.2
+            <br />
+                      phases:
+            <br />
+                        install:
+            <br />
+                          runtime-versions:
+            <br />
+                            docker: 19
+            <br />
+                        pre_build:
+            <br />
+                          commands:
+            <br />
+                            - echo Logging in to Amazon ECR...
+            <br />
+                            - aws --version
+            <br />
+                            - $(aws ecr get-login --region ${AWS::Region} --no-include-email)
+            <br />
+                            - REPOSITORY_URI=${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${CodePipelineContainerRegistry}
+            <br />
+                            - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            <br />
+                            - IMAGE_TAG=${!COMMIT_HASH:=latest}
+          </code>
+        </td>
+        <td>The required steps to enable publishing Docker image to the Docker registry.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                        build:
+            <br />
+                          commands:
+            <br />
+                            - echo Build started on `date`
+            <br />
+                            - echo Building the Docker image...
+            <br />
+                            - cd write-it-down-web
+            <br />
+                            - npm install
+            <br />
+                            - npm run build
+          </code>
+        </td>
+        <td>The steps to build the software.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                            - |
+            <br />
+                                cat &gt; Dockerfile &lt;&lt;EOF
+            <br />
+                                FROM nginx
+            <br />
+                                COPY build /usr/share/nginx/html/
+            <br />
+                                EOF
+            <br />
+                            - docker build -t $REPOSITORY_URI:latest .
+            <br />
+                            - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+          </code>
+        </td>
+        <td>Add the Dockerfile dynamically to the project.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                        post_build:
+            <br />
+                          commands:
+            <br />
+                            - echo Build completed on `date`
+            <br />
+                            - echo Pushing the Docker images...
+            <br />
+                            - docker push $REPOSITORY_URI:latest
+            <br />
+                            - docker push $REPOSITORY_URI:$IMAGE_TAG
+          </code>
+        </td>
+        <td>Push the Docker image to the Docker registry.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                            - echo Writing image definitions file...
+            <br />
+                            - printf '[{"name":"WebServer","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG &gt; imagedefinitions.json
+          </code>
+        </td>
+        <td>Generate the image definition file so AWS knows how to deploy the Docker image.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                      artifacts:
+            <br />
+                        files: imagedefinitions.json
+            <br />
+                        base-directory: write-it-down-web
+          </code>
+        </td>
+        <td>Tell the CodeBuild project how to pack the build artifact.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LogsConfig:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CloudWatchLogs:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Status:&nbsp;DISABLED
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S3Logs:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Status:&nbsp;ENABLED
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Location:&nbsp;!Sub&nbsp;${CodePipelineBucket.Arn}/BuildLogs
+          </code>
+        </td>
+        <td>Store the build log in S3 bucket.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CodePipelineServiceRole:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssumeRolePolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;codepipeline.amazonaws.com
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;sts:AssumeRole
+          </code>
+        </td>
+        <td>The IAM Role to allow the CodePipeline service to access the required resources.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;PolicyName:&nbsp;CodePipelineServicePolicy
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${SourceCodeConnectionArn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;codestar-connections:UseConnection
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
+          </code>
+        </td>
+        <td>It needs to use the source code connection string to pull the source code from the repository.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${CodePipelineBucket.Arn}/*
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;s3:*
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
+          </code>
+        </td>
+        <td>It needs to access to the S3 bucket.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Resource:&nbsp;!Sub&nbsp;${CodeBuildProject.Arn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;codebuild:*
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
+          </code>
+        </td>
+        <td>It needs to access to the CodeBuild project.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                          - Resource: !Sub ${WebServerContainerExecutionServerRole.Arn}
+            <br />
+                            Action: iam:PassRole
+            <br />
+                            Effect: Allow
+          </code>
+        </td>
+        <td>It needs to pass the role to another service.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                          - Resource:
+            <br />
+                              - !Sub ${WebServerContainerCluster.Arn}
+            <br />
+                              - !Ref WebServerContainerService
+            <br />
+                            Action: ecs:*
+            <br />
+                            Effect: Allow
+          </code>
+        </td>
+        <td>It needs to access the container cluster.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                          - Resource: "*"
+            <br />
+                            Action:
+            <br />
+                              - ecs:DescribeServices
+            <br />
+                              - ecs:DescribeTaskDefinition
+            <br />
+                              - ecs:RegisterTaskDefinition
+            <br />
+                            Effect: Allow
+          </code>
+        </td>
+        <td>And some other required actions.</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CodePipeline:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::CodePipeline::Pipeline
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RoleArn:&nbsp;!Sub&nbsp;${CodePipelineServiceRole.Arn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ArtifactStore:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;S3
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Location:&nbsp;!Ref&nbsp;CodePipelineBucket
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RestartExecutionOnUpdate:&nbsp;true
+          </code>
+        </td>
+        <td>
+          This is the pipeline to buid and deploy the software. It will use the S3 bucket created earlier to store all
+          the artifacts.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stages:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Source
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actions:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;Default
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActionTypeId:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Category:&nbsp;Source
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Owner:&nbsp;AWS
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Provider:&nbsp;CodeStarSourceConnection
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"1"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OutputArtifacts:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Name:&nbsp;SourceArtifact
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configuration:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ConnectionArn:&nbsp;!Sub&nbsp;${SourceCodeConnectionArn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FullRepositoryId:&nbsp;!Sub&nbsp;${SourceCodeRepository}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BranchName:&nbsp;master
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OutputArtifactFormat:&nbsp;CODE_ZIP
+          </code>
+        </td>
+        <td>Define where is the source code.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                    - Name: Build
+            <br />
+                      Actions:
+            <br />
+                        - Name: Default
+            <br />
+                          ActionTypeId:
+            <br />
+                            Category: Build
+            <br />
+                            Owner: AWS
+            <br />
+                            Provider: CodeBuild
+            <br />
+                            Version: "1"
+            <br />
+                          InputArtifacts:
+            <br />
+                            - Name: SourceArtifact
+            <br />
+                          OutputArtifacts:
+            <br />
+                            - Name: BuildArtifact
+            <br />
+                          Configuration:
+            <br />
+                            ProjectName: !Ref CodeBuildProject
+          </code>
+        </td>
+        <td>Define the build stage.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+                    - Name: Deploy
+            <br />
+                      Actions:
+            <br />
+                        - Name: Default
+            <br />
+                          ActionTypeId:
+            <br />
+                            Category: Deploy
+            <br />
+                            Owner: AWS
+            <br />
+                            Provider: ECS
+            <br />
+                            Version: "1"
+            <br />
+                          InputArtifacts:
+            <br />
+                            - Name: BuildArtifact
+            <br />
+                          Configuration:
+            <br />
+                            ClusterName: !Ref WebServerContainerCluster
+            <br />
+                            ServiceName: !Ref WebServerContainerService
+          </code>
+        </td>
+        <td>Define the deploy stage.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Update the stack then you should be able to see the CodePipeline. Execute the pipeline and you should get the software
+  built and deployed to the Docker instances.
+</p>
+<!-- /wp:paragraph -->

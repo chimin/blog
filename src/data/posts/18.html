@@ -1,0 +1,584 @@
+<!-- wp:paragraph -->
+<p>
+  This is continued from
+  <a href="https://c4compile.me/2021/01/13/aws-cloudformation-02-create-an-auto-scaling-group/">
+    AWS CloudFormation: 02 – Create an auto scaling&nbsp;group
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want to see all the logs in a central place.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What we need?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Install CloudWatch agent on the EC2 instances to collect logs.</li>
+  <li>Create a S3 bucket to store the logs.</li>
+  <li>Create a CloudWatch log group to see the logs.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This is what we are going to do:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":471,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img
+      src="https://c4compile.files.wordpress.com/2020/12/template1-designer-3.png?w=1024"
+      alt=""
+      class="wp-image-471"
+    />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong><strong>02-autoscaling-template.yaml</strong></strong>
+  from previous post and save as
+  <strong>03-cloudwatch-template.yaml</strong>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Launch Template</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The EC2 instance will need to have permission to post to the CloudWatch logs. We need to attach a IAM Role to the EC2
+  instance. Add these to the resources:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerServiceRole:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssumeRolePolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;ec2.amazonaws.com
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;sts:AssumeRole
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ManagedPolicyArns:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+          </code>
+        </td>
+        <td>
+          This is the IAM Role to post to the CloudWatch logs. It uses the managed policy named
+          CloudWatchAgentServerPolicy.
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerInstanceProfile:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::InstanceProfile
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Roles:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerServiceRole
+          </code>
+        </td>
+        <td>This is the EC2 instance profile that we can attach it to the EC2 instance in the launch template.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Modify these resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;WebServerLaunchTemplate:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::LaunchTemplate
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            ...
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IamInstanceProfile:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name:&nbsp;!Ref&nbsp;WebServerInstanceProfile
+            </span>
+          </code>
+        </td>
+        <td>Attach the EC2 instance profile to the EC2 instance.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UserData:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fn::Base64:&nbsp;!Sub&nbsp;|
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#!/bin/bash&nbsp;-x
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/opt/aws/bin/cfn-init&nbsp;-v&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--stack&nbsp;${AWS::StackName}&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--resource&nbsp;WebServerLaunchTemplate&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--region&nbsp;${AWS::Region}&nbsp;
+            </span>
+          </code>
+        </td>
+        <td>
+          Change to use CloudFormation helper script to setup the EC2 instance. The details will be retrieved from the
+          metadata defined later.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/opt/aws/bin/cfn-signal&nbsp;-e&nbsp;$?&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--stack&nbsp;${AWS::StackName}&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--resource&nbsp;WebServerAutoScalingGroup&nbsp;\
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--region&nbsp;${AWS::Region}
+            </span>
+          </code>
+        </td>
+        <td>
+          Signal the auto scaling group that this instance is ready so the auto scaling group doesn't need to wait
+          indefinitely for the instance to be ready.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;Metadata:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AWS::CloudFormation::Init:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;configSets:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Install
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Configure
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Start
+            </span>
+          </code>
+        </td>
+        <td>Define the config sets for the CloudFormation metadata.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commands:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;install:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;command:&nbsp;!Sub&nbsp;|
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yum&nbsp;update&nbsp;-y
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yum&nbsp;install&nbsp;-y&nbsp;ruby&nbsp;wget&nbsp;amazon-cloudwatch-agent
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;amazon-linux-extras&nbsp;install&nbsp;-y&nbsp;nginx1
+            </span>
+          </code>
+        </td>
+        <td>Setup NGINX web server and the CloudWatch agent.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;files:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content:&nbsp;!Sub&nbsp;|
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"logs":&nbsp;{
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"logs_collected":&nbsp;{
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"files":&nbsp;{
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"collect_list":&nbsp;[
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"file_path":&nbsp;"/var/log/nginx/error.log",&nbsp;
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"log_group_name":&nbsp;"${CloudWatchLogGroup}",
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"log_stream_name":&nbsp;"nginx"
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+            </span>
+          </code>
+        </td>
+        <td>Setup the CloudWatch agent configuration file to collect error logs from NGINX web server.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commands:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;command:&nbsp;|
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;systemctl&nbsp;enable&nbsp;nginx
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;systemctl&nbsp;start&nbsp;nginx
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl&nbsp;-a&nbsp;fetch-config&nbsp;-m&nbsp;ec2&nbsp;-s&nbsp;-c&nbsp;file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+            </span>
+          </code>
+        </td>
+        <td>Start the NGINX web server and the CloudWatch agent.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerAutoScalingGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::AutoScaling::AutoScalingGroup
+            <br />
+            ...
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;CreationPolicy:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResourceSignal:
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Timeout:&nbsp;PT5M
+            </span>
+          </code>
+        </td>
+        <td>Change the auto scaling group to wait for the EC2 instance to be ready in 5 minutes.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Logs</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We will create the CloudWatch log group. Add this to the resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudWatchLogGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::Logs::LogGroup
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RetentionInDays:&nbsp;3
+          </code>
+        </td>
+        <td>The log group for CloudWatch. The log entries will be automatically deleted in 3 days.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  We can log the events in AWS to the CloudWatch log group also, for example events like AccessDenied. We can see the
+  events directly in CloudTrail but logging them to the CloudWatch gives us more flexibility in searching the log
+  entries. Add these to the resources:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudTrailBucket:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::S3::Bucket
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LifecycleConfiguration:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rules:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Status:&nbsp;Enabled
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExpirationInDays:&nbsp;3
+          </code>
+        </td>
+        <td>This is the S3 bucket to store the logs.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudTrailBucketPolicy:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::S3::BucketPolicy
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bucket:&nbsp;!Ref&nbsp;CloudTrailBucket
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Sid:&nbsp;AWSCloudTrailAclCheck20150319
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;cloudtrail.amazonaws.com
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;s3:GetBucketAcl
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Resource:&nbsp;!Sub&nbsp;arn:aws:s3:::${CloudTrailBucket}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Sid:&nbsp;AWSCloudTrailWrite20150319
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;cloudtrail.amazonaws.com
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;s3:PutObject
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Resource:&nbsp;!Sub&nbsp;arn:aws:s3:::${CloudTrailBucket}/AWSLogs/*
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringEquals:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s3:x-amz-acl:&nbsp;bucket-owner-full-control
+          </code>
+        </td>
+        <td>This is the S3 bucket policy that allows CloudTrail to put object in the bucket.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudTrailServiceRole:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::IAM::Role
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssumeRolePolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Principal:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service:&nbsp;cloudtrail.amazonaws.com
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;sts:AssumeRole
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;PolicyName:&nbsp;CloudTrailServicePolicy
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PolicyDocument:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;"2012-10-17"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statement:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Effect:&nbsp;Allow
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Resource:&nbsp;!Sub&nbsp;${CloudWatchLogGroup.Arn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Action:&nbsp;logs:*
+          </code>
+        </td>
+        <td>This is the IAM Role that allows CloudTrail to post log entries to the CloudWatch log group.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;CloudTrail:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::CloudTrail::Trail
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsLogging:&nbsp;true
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S3BucketName:&nbsp;!Ref&nbsp;CloudTrailBucket
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CloudWatchLogsLogGroupArn:&nbsp;!Sub&nbsp;${CloudWatchLogGroup.Arn}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CloudWatchLogsRoleArn:&nbsp;!Sub&nbsp;${CloudTrailServiceRole.Arn}
+          </code>
+        </td>
+        <td>This configures CloudTrail to log events to S3 bucket and CloudWatch.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Update the stack then you should be able to see the logs in the CloudWatch. Note that it will take 5 min - 15 min
+  before the log entries appear in both CloudTrail and CloudWatch. This is a pain in the ass.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  When the CloudFormation contains IAM Role resources, we need to specifically acknowledge it before the AWS can create
+  the resources.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":492,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/12/image-6.png?w=1024" alt="" class="wp-image-492" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>When you delete the stack, it will not allow you to do so also if your S3 bucket is not empty.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":495,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/12/image-8.png?w=1024" alt="" class="wp-image-495" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>You will have to manually empty the S3 bucket and delete the stack again.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will do
+  <a href="https://c4compile.me/2021/01/23/aws-cloudformation-04-build-and-deploy-pipeline/">
+    AWS CloudFormation: 04 – Build and deploy pipeline
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

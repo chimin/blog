@@ -1,0 +1,828 @@
+<!-- wp:heading -->
+<h2>Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"align":"center","id":317,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img
+      src="https://c4compile.files.wordpress.com/2020/11/2020-11-03-21_52_12-dist.png?w=626"
+      alt=""
+      class="wp-image-317"
+    />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  We will make a site killer browser extension here for Chrome and Firefox. It's meant to kill the tab if the hostname
+  is in the blocked list. There will be 3 modules in this project:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table {"className":"is-style-regular"} -->
+<figure class="wp-block-table is-style-regular">
+  <table>
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>site-killer-common</td>
+        <td>Base module that contains all the logics</td>
+      </tr>
+      <tr>
+        <td>site-killer-chrome</td>
+        <td>Module to bind the Chrome specific capabilities to the logics behind</td>
+      </tr>
+      <tr>
+        <td>site-killer-firefox</td>
+        <td>Module to bind the Firefox specific capabilities to the logics behind</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  We will use
+  <a href="https://lerna.js.org/">Lerna</a>
+  to manage these projects.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3>1. Setup</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>First we will setup Lerna. Create a new empty directory and run this command:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+echo {} &gt; package.json
+npm i -D lerna
+npx lerna init</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will install Lerna in the workspace only, so you can use different version of Lerna in your machine. You should
+  see
+  <strong>lerna.json</strong>
+  is created in your directory with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.0"
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It means it will manage the modules in the
+  <strong>packages</strong>
+  directory. Now we modify
+  <strong>package.json</strong>
+  to add some scripts to it to help us in the code development flow:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+  ...
+  "name": "site-killer",
+  "scripts": {
+    "bootstrap": "lerna exec --stream --include-dependencies npm install",
+    "build": "lerna run --stream --include-dependencies build",
+    "dev": "lerna run --parallel dev"
+  }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>Now you can do these:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>npm run bootstrap</td>
+        <td>
+          Install the dependencies for all the modules. It will do these following the order of the dependencies of the
+          module.
+        </td>
+      </tr>
+      <tr>
+        <td>npm run build</td>
+        <td>
+          Build all the modules. It will do these following the order of the dependencies of the module so the
+          dependencies will get to be built first.
+        </td>
+      </tr>
+      <tr>
+        <td>npm run dev</td>
+        <td>
+          Watch and build all the modules if there are changes. It will do these in parallel. It will show some error in
+          the initial stage where the dependencies are not built first, but eventually it should get everything correct.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Now we can start the development work.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>2. Create site-killer-common module</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2.1 Setup Webpack</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Create the directory
+  <strong>./packages/common</strong>
+  and create
+  <strong>package.json</strong>
+  in it with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+    "name": "site-killer-common",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "scripts": {
+        "build": "webpack",
+        "dev": "webpack --watch --devtool inline-source-map"
+    }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will enable the scripts to build or watch the module. It also tell where is the main entry file that contains all
+  the exported capabilities from this module. Next we will install the necessary dependencies for it by running this
+  command:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+npm i -D webpack webpack-cli ts-loader typescript copy-webpack-plugin typings-bundler-plugin</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will install these dependencies:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Dependency Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>webpack + webpack-cli</td>
+        <td>Webpack to build your module</td>
+      </tr>
+      <tr>
+        <td>ts-loader</td>
+        <td>Webpack loader to compile the Typescript files</td>
+      </tr>
+      <tr>
+        <td>typescript</td>
+        <td>Typescript compiler</td>
+      </tr>
+      <tr>
+        <td>copy-webpack-plugin</td>
+        <td>
+          Copy files to
+          <strong>dist</strong>
+          directory after Webpack compilation stage
+        </td>
+      </tr>
+      <tr>
+        <td>typings-bundler-plugin</td>
+        <td>
+          Generate the type definition files in the
+          <strong>dist</strong>
+          directory
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we create
+  <strong>webpack.config.js</strong>
+  to tell Webpack how to compile our module:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
+const TypingsBundlerPlugin = require('typings-bundler-plugin');
+
+module.exports = {
+    entry: {
+        index: './src/index.ts'    // this is our main entry file, this will contain all the exports from our module
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),    // this is the output directory
+        filename: '[name].js',    // this is the output file name
+        libraryTarget: 'umd'    // this means we are building a library
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
+    plugins: [
+        new CopyPlugin({    // copy the files from assets to the dist directory
+            patterns: [
+                { from: './assets' }
+            ]
+        }),
+        new TypingsBundlerPlugin({    // generate the type definition file
+            out: 'index.d.ts'
+        })
+    ],
+    watchOptions: {    // ignore output directories so we don't trigger the Webpack infinitely here
+        ignored: /\/common\/dist\//
+    }
+};</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we create the
+  <strong>tsconfig.json</strong>
+  to tell the Typescript compiler how to compile our module:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "declaration": true
+    }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will generate the source maps and the type definition file. The source maps is very useful if we want to debug
+  our codes later. It must be turned ON here then the Webpack can choose if it wants to include it in the final output.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2.2 Code the logics</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  First we will create a
+  <strong>global-events</strong>
+  system to wire the events in the the module so we don't have to pass the callbacks around. Create
+  <strong>./src/utils/global-events.ts</strong>
+  with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+export namespace globalEvents {
+
+    class Event {
+
+        private readonly callbacks: (() =&gt; void)[] = [];
+
+        register(callback: () =&gt; void) {
+            this.callbacks.push(callback);
+        }
+
+        notify() {
+            this.callbacks.forEach(e =&gt; e());
+        }
+
+    }
+
+    export const blockedList = new Event();
+    export const visitedList = new Event();
+    export const rerun = new Event();
+
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>We have defined 3 global events here:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Event Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>blockedList</td>
+        <td>Triggered when the blocked list changed</td>
+      </tr>
+      <tr>
+        <td>visitedList</td>
+        <td>Triggered when the visited list changed</td>
+      </tr>
+      <tr>
+        <td>rerun</td>
+        <td>Triggered when need to rerun the logic to kill the tabs</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we will create
+  <strong>./src/utils/blocked-list.ts</strong>
+  to manage the blocked list:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { globalEvents } from "./global-events";
+
+export namespace blockedList {
+
+    export function get() {
+        const list = JSON.parse(localStorage.getItem('blockedList'));
+        return Array.isArray(list) ? list as string[] : [];
+    }
+
+    export function update(list: string[]) {
+        localStorage.setItem('blockedList', JSON.stringify(list));
+    }
+
+    export function add(hostname: string) {
+        const list = get();
+        const newList = list.filter(e =&gt; e != hostname).concat(hostname).sort();
+        update(newList);
+        globalEvents.blockedList.notify();
+    }
+
+    export function remove(hostname: string) {
+        update(get().filter(e =&gt; e != hostname));
+        globalEvents.blockedList.notify();
+    }
+
+    export function clear() {
+        update([]);
+        globalEvents.blockedList.notify();
+    }
+
+    export function contains(hostname: string) {
+        return !!get().find(e =&gt; e == hostname);
+    }
+
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This is just some simple CRUD methods to manage the list. It will always load the list from local storage and store it
+  whenever there are changes. It will also send out an event if there are changes in the list.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we will create
+  <strong>./src/utils/visited-list.ts</strong>
+  to manage the visited list:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { blockedList } from "./blocked-list";
+import { globalEvents } from "./global-events";
+
+export namespace visitedList {
+
+    export function get() {
+        const list = JSON.parse(localStorage.getItem('visitedList'));
+        return Array.isArray(list) ? list as string[] : [];
+    }
+
+    export function update(list: string[]) {
+        localStorage.setItem('visitedList', JSON.stringify(list));
+    }
+
+    export function add(url: URL) {
+        if (!url.protocol.match(/^https?:$/) || blockedList.contains(url.hostname)) {
+            return;
+        }
+
+        const list = get();
+        const newList = list.filter(e =&gt; e != url.hostname).concat(url.hostname);
+        arrayKeepLast(newList, 100);
+        update(newList);
+        globalEvents.visitedList.notify();
+    }
+
+    export function remove(hostname: string) {
+        update(get().filter(e =&gt; e != hostname));
+        globalEvents.visitedList.notify();
+    }
+
+    export function clear() {
+        update([]);
+        globalEvents.visitedList.notify();
+    }
+
+    function arrayKeepLast&lt;T&gt;(list: T[], keepCount: number) {
+        const deleteCount = list.length - keepCount;
+        if (deleteCount &gt; 0) {
+            list.splice(0, deleteCount);
+        }
+    }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It's almost same like the blocked list. The difference is that during addition, it will extract the hostname from the
+  URL and only supports HTTP or HTTPS protocol. It only keeps the latest 100 items.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2.3 Craft the interface</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The interface will be wholly constructed in code. First we create
+  <strong>./src/comps/popup.ts</strong>
+  :
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { blockedListComponent } from './blocked-list';
+import { visitedListComponent } from './visited-list';
+import { globalEvents } from '../utils/global-events';
+
+export function popupComponent() {
+    const div = document.createElement('div');
+
+    function refresh() {
+        div.innerHTML = '';
+        div.appendChild(blockedListComponent());
+        div.appendChild(visitedListComponent());
+    }
+
+    globalEvents.blockedList.register(() =&gt; refresh());
+    globalEvents.visitedList.register(() =&gt; refresh());
+
+    refresh();
+
+    return div;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It will just call the
+  <strong>blockedListComponent</strong>
+  and
+  <strong>visitedListComponent</strong>
+  to render the list. It will also refresh the contents when the blocked list or the visited list changed.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we create
+  <strong>./src/comps/blocked-list.ts</strong>
+  :
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { blockedList } from "../utils/blocked-list";
+import { globalEvents } from "../utils/global-events";
+
+export function blockedListComponent() {
+    const div = document.createElement('div');
+
+    div.appendChild(header());
+
+    const ul = document.createElement('ul');
+    div.appendChild(ul);
+
+    const items = blockedList.get();
+    if (items.length) {
+        items.forEach(e =&gt; ul.appendChild(listItem(e)));
+    } else {
+        const li = document.createElement('li');
+        li.textContent = 'Empty';
+        ul.appendChild(li);
+    }
+
+    return div;
+}
+
+function header() {
+    const header = document.createElement('h3');
+
+    const span = document.createElement('span');
+    span.textContent = 'Blocked';
+    span.style.marginRight = '.3em';
+    header.appendChild(span);
+
+    const clearButton = document.createElement('a');
+    clearButton.textContent = '[Clear]';
+    clearButton.href = "#";
+    clearButton.onclick = () =&gt; {
+        blockedList.clear();
+        return false;
+    };
+    header.appendChild(clearButton);
+
+    const rerunButton = document.createElement('a');
+    rerunButton.textContent = '[Rerun]';
+    rerunButton.href = "#";
+    rerunButton.onclick = () =&gt; {
+        globalEvents.rerun.notify();
+        return false;
+    };
+    header.appendChild(rerunButton);
+
+    return header;
+}
+
+function listItem(item: string) {
+    const li = document.createElement('li');
+
+    const removeButton = document.createElement('a');
+    removeButton.textContent = '[Remove]';
+    removeButton.href = "#";
+    removeButton.onclick = () =&gt; {
+        blockedList.remove(item);
+        return false;
+    };
+    li.appendChild(removeButton);
+
+    const span = document.createElement('span');
+    span.textContent = item;
+    span.style.marginLeft = '.3em';
+    li.appendChild(span);
+
+    return li;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>It consists of 3 sections:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Section</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>blockedListComponent</td>
+        <td>Create the list component</td>
+      </tr>
+      <tr>
+        <td>header</td>
+        <td>Create the header with clear and rerun button</td>
+      </tr>
+      <tr>
+        <td>listItem</td>
+        <td>Create the list item component</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we create
+  <strong>./src/utils/visited-list.ts</strong>
+  :
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { blockedList } from "../utils/blocked-list";
+import { visitedList } from "../utils/visited-list";
+
+export function visitedListComponent() {
+    const div = document.createElement('div');
+
+    div.appendChild(header());
+
+    const ul = document.createElement('ul');
+    div.appendChild(ul);
+
+    const items = visitedList.get().reverse();
+    if (items.length) {
+        items.forEach(e =&gt; ul.appendChild(listItem(e)));
+    } else {
+        const li = document.createElement('li');
+        li.textContent = 'Empty';
+        ul.appendChild(li);
+    }
+    
+    return div;
+}
+
+function header() {
+    const header = document.createElement('h3');
+
+    const span = document.createElement('span');
+    span.textContent = 'Visited';
+    span.style.marginRight = '.3em';
+    header.appendChild(span);
+
+    const clearButton = document.createElement('a');
+    clearButton.textContent = '[Clear]';
+    clearButton.href = "#";
+    clearButton.onclick = () =&gt; {
+        visitedList.clear();
+        return false;
+    };
+    header.appendChild(clearButton);
+
+    return header;
+}
+
+function listItem(item: string) {
+    const li = document.createElement('li');
+
+    const blockButton = document.createElement('a');
+    blockButton.textContent = '[Block]';
+    blockButton.href = "#";
+    blockButton.onclick = () =&gt; {
+        blockedList.add(item);
+        visitedList.remove(item);
+        return false;
+    };
+    li.appendChild(blockButton);
+
+    const span = document.createElement('span');
+    span.textContent = item;
+    span.style.marginLeft = '.3em';
+    li.appendChild(span);
+
+    return li;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It's similar to
+  <strong>blockedListComponent</strong>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2.4 Export</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Now we need to export them so they can be used by other module. Create
+  <strong>./src/index.ts</strong>
+  with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+export { popupComponent } from './comps/popup';
+export { blockedList } from './utils/blocked-list';
+export { visitedList } from './utils/visited-list';
+export { globalEvents } from './utils/global-events';</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will export them in the main entry file so the downstream doesn't have to import them from the inner files.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Create an empty
+  <strong>./packages/common/assets</strong>
+  directory for now. We will populate it later. Now you can run this command in the root directory to build it:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">npm run build</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The output will be in
+  <strong>./packages/common/dist</strong>
+  directory.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will work on the
+  <a
+    href="https://c4compile.me/2020/11/14/lerna-to-manage-multiple-modules-site-killer-extension-for-chrome-and-firefox-part-2/"
+  >
+    real Chrome extension
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

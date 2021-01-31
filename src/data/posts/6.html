@@ -1,0 +1,156 @@
+<!-- wp:paragraph -->
+<p>
+  This is continue from
+  <a href="https://c4compile.me/2020/07/18/make-a-video-conference-web-application-part-3-video-call/">part 3</a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>STUN server and TURN server</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>1. Understand the need of STUN server and TURN server</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  WebRTC works on p2p connection but that's not so possible given all people is behind some router nowdays. Thus, we
+  need the STUN server for public IP discovery and TURN server to relay the traffic between the participants behind the
+  router.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":108,"sizeSlug":"large"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/06/untitled-diagram-5.png?w=551" alt="" class="wp-image-108" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  There are some free STUN servers online. The one I use is
+  <strong>stun:stun.l.google.com:19302</strong>
+  . For TURN server, you will need to host your own. As you can see, all the video streams will actually go through the
+  TURN server to reach the target participant. TURN server will need to handle a very high load of traffic. That's why
+  you can find a public STUN server but not a TURN server. The TURN server will cost a bomb if it's made public.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2. Create a TURN server</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  There are a few Open Source project for the TURN servers. The one I use is
+  <a href="https://github.com/coturn/coturn">coturn</a>
+  . I will just use Docker to set it up. This is the
+  <strong>docker-compose.yml</strong>
+  :
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+version: "3.8"
+services: 
+    coturn:
+        image: boldt/coturn
+        ports:
+            - 3478:3478
+            - 3478:3478/udp
+            - 40000-41000:40000-41000/udp
+        environment: 
+            - USERNAME=turn
+            - PASSWORD=turnpass
+            - MIN_PORT=40000
+            - MAX_PORT=41000</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Run
+  <strong>docker-compose up</strong>
+  to start the server. Make sure all the ports are opened and reachable from the Internet.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>3. Modify browser application to use STUN server and TURN server</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong>./src/app/app.component.ts</strong>
+  in your editor and modify the
+  <strong>setupRtcPeerConnection</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private setupRtcPeerConnection(target: string) {
+    ...
+    const turnServer = `turn:${url.hostname}:3478`;
+    const rtc = this.rtcList[target] = new RTCPeerConnection({
+      iceServers: [{
+        urls: ['stun:stun.l.google.com:19302']
+      }, {
+        urls: [turnServer + '?transport=tcp', turnServer + '?transport=udp'],
+        username: 'turn',
+        credential: 'turnpass'
+      }]
+    });
+    ...
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This assume the TURN server is together with the signaling server.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  For the browser application to be able to access the webcam on the client machine, the browser application has to be
+  hosted on a HTTPS server. I'm not going into the details of these but these are what you can do:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Get a free host name at
+    <a href="http://www.noip.com">http://www.noip.com</a>
+    .
+  </li>
+  <li>
+    Get free SSL certificate using Certbot from
+    <a href="https://certbot.eff.org/">https://certbot.eff.org/</a>
+    .
+  </li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  That's all for it. This is not a good solution to do video conference because the client machine will have to send the
+  same traffic to all the participants. It will congest the network very fast. It won't be able to support a lot of
+  participants, but it's enough for fun.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  You can get the full source code
+  <a href="https://github.com/chimin/blow-water">here</a>
+  .
+</p>
+<!-- /wp:paragraph -->

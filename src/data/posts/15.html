@@ -1,0 +1,336 @@
+<!-- wp:paragraph -->
+<p>
+  This is continued from
+  <a
+    href="https://c4compile.me/2020/11/14/lerna-to-manage-multiple-modules-site-killer-extension-for-chrome-and-firefox-part-2/"
+  >
+    Lerna to manage multiple modules – Site killer extension for Chrome and Firefox – Part 2
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>4. Firefox browser add-on</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>4.1 Setup</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Create the directory
+  <strong>./packages/firefox</strong>
+  and create
+  <strong>package.json</strong>
+  in it with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+  "name": "site-killer-firefox",
+  "scripts": {
+    "build": "webpack &amp;&amp; bestzip ./out/site-killer-source.zip package.json package-lock.json tsconfig.json webpack.config.js src/*",
+    "dev": "webpack --watch --devtool inline-source-map"
+  }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The build command is a bit different from the build command for Chrome module. It make a ZIP file for the source code
+  also. The source code is needed when you want to publish your extension on Firefix website because we are using
+  Webpack to compile our source code.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Next we will install the necessary dependencies for it by running this command:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+npm i -D webpack webpack-cli ts-loader typescript copy-webpack-plugin zip-webpack-plugin bestzip web-ext-types
+npm i ..\common</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  We have installed the
+  <strong>common</strong>
+  module as the dependency here. We also installed these additional dependencies:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Dependency Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>bestzip</td>
+        <td>Make a zip file from source codes so we can publish it to the Firefox add-ons site</td>
+      </tr>
+      <tr>
+        <td>web-ext-types</td>
+        <td>Type definition file for Firefox extension development</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we create
+  <strong>webpack.config.js</strong>
+  to tell Webpack how to compile our module:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
+
+module.exports = {
+    entry: {
+        background: './src/background.ts',
+        popup: './src/popup.ts'
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
+    plugins: [
+        new CopyPlugin({
+            patterns: [
+                { from: './node_modules/site-killer-common/assets' }
+            ]
+        }),
+        new ZipPlugin({
+            path: path.resolve(__dirname, 'out'),
+            filename: 'site-killer.zip'
+        })
+    ],
+    watchOptions: {
+        ignored: /\/firefox\/(dist|out)\//
+    }
+};</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It's exactly the same as the one in the Chrome module. Next we create the
+  <strong>tsconfig.json</strong>
+  to tell the Typescript compiler how to compile our module:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+{
+    "compilerOptions": {
+        "sourceMap": true
+    }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>Once again, it's exactly the same as the one in the Chrome module.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>3.3 Code the logics</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We will create
+  <strong>./src/background.ts</strong>
+  file to record the visited list and kill the tab if the URL is in the blocked list. Put these contents in it:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+/// &lt;reference path="../node_modules/web-ext-types/global/index.d.ts" /&gt;
+
+import { blockedList, visitedList } from "site-killer-common";
+
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) =&gt; {
+    const url = new URL(tab.url);
+    if (blockedList.contains(url.hostname)) {
+        await browser.tabs.remove(tabId);
+        await browser.notifications.create({
+            message: `Killed ${url}`,
+            title: 'Site Killer',
+            iconUrl: 'icon.png',
+            type: 'basic'
+        });
+    } else {
+        visitedList.add(url);
+    }
+});</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>It's similar to the one in Chrome module except for these:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>It needs a reference to the web-ext-types type definition file.</li>
+  <li>
+    It uses API from
+    <strong>browser</strong>
+    instead of
+    <strong>chrome</strong>
+    namespace.
+  </li>
+  <li>
+    The API returns
+    <strong>Promise</strong>
+    so we don't have to wrap them.
+  </li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  Now we will create
+  <strong>./src/popup.ts</strong>
+  that will show the popup page. Put these contents in it:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import { blockedList, globalEvents, popupComponent } from 'site-killer-common';
+
+globalEvents.rerun.register(async () =&gt; {
+    const tabs = await browser.tabs.query({});
+
+    let killed = 0;
+    for (const tab of tabs) {
+        const url = new URL(tab.url);
+        if (blockedList.contains(url.hostname)) {
+            await browser.tabs.remove(tab.id);
+            killed++;
+        }
+    }
+
+    await browser.notifications.create({
+        message: `Killed ${killed} tabs`,
+        title: 'Site Killer',
+        iconUrl: 'icon.png',
+        type: 'basic'
+    });
+});
+
+document.body.appendChild(popupComponent());</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  It is similar to the one in Chrome module except the API returns
+  <strong>Promise</strong>
+  so we don't have to wrap it here.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>4.3 Manifest file</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We have setup our Webpack to copy the manifest files from the
+  <strong>common</strong>
+  module, so no work is neede here :)
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>4.4 Test</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Now you can run this command in the root directory to build it:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">npm run build</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  To test it in the Firefox browser, you will need to go to the browser debugging page first. Then you click on the Load
+  Temporary Add-on button. Locate the
+  <strong>./dist/manifest.json</strong>
+  file in the Firefox module.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":385,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/11/image-14.png?w=1024" alt="" class="wp-image-385" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Then you should see your extension loaded in the page.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":386,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/11/image-15.png?w=848" alt="" class="wp-image-386" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>The icon of your extension should appear in the top right corner now.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":388,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/11/image-16.png?w=381" alt="" class="wp-image-388" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>That's it. We are done here. The full source code is available at https://github.com/chimin/site-killer</p>
+<!-- /wp:paragraph -->

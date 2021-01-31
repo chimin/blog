@@ -1,0 +1,84 @@
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Just to find out what's the performance of each web application framework</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What to do?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"align":"center","id":310,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/11/image-3.png?w=540" alt="" class="wp-image-310" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>A test application will bombard the web application with 100 requests at the same time.</li>
+  <li>Token-server is written in various framework.</li>
+  <li>Token-server will perform a HTTP call to another backend server.</li>
+  <li>Identity-server will perform a fake sleep for 5 secs.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>What are the framework used?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Web app will use
+    <ol>
+      <li>Java 11 + Spring Boot WebMVC 2.3.4</li>
+      <li>Java 11 + Micronaut 1.0.3</li>
+      <li>Kotlin + Spring Boot Webflux 2.3.4</li>
+      <li>NodeJS 12.16.1 + Express 4.17.1</li>
+      <li>NodeJS 12.16.1 + Restify 8.5.1</li>
+      <li>.NET Core 3.1.300 + ASP .NET Core 3.1.2</li>
+    </ol>
+  </li>
+  <li>Test app will use Java 11 console application</li>
+  <li>Another server will use Jave 11 Spring Boot WebMVC 2.3.4</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>Result</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"align":"center","id":308,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/11/image-2.png?w=1024" alt="" class="wp-image-308" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    Spring Boot WebMVC is the slowest. Not surprise here because it's the only framework that use thread per request
+    model here. It won't work well in the above scenario.
+  </li>
+  <li>Spring Boot Webflux and Micronaut works better than NodeJS. That's a surprise.</li>
+  <li>
+    .NET Core is the fastest. This test is done on a Windows machine. Not sure if the it will be the same on Linux
+    machine.
+  </li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>Notes</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The test might be different on your machine. The full source code is here: https://github.com/chimin/webapp-perf</p>
+<!-- /wp:paragraph -->

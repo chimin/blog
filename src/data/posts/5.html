@@ -1,0 +1,512 @@
+<!-- wp:paragraph -->
+<p>
+  This is continue from
+  <a href="https://c4compile.me/2020/07/05/make-a-video-conference-web-application-part-2-browser-application/">
+    part 2
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Browser Application - Video Call</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>1. Design the UI for Video Call</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We will use
+  <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia">MediaDevices.getUserMedia()</a>
+  to get the webcam video stream. Then we will use the
+  <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection">RTCPeerConnection</a>
+  to stream it to another user. All these are built-in functions of the browser. Such convenient.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  The web application will show the participant face as big as possible. It will use the whole browser area to show all
+  the videos. It will divide the browser area into a grid and each video will be in its own box. For example if there's
+  4 people in the room:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":97,"sizeSlug":"large"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/06/untitled-diagram-4.png?w=321" alt="" class="wp-image-97" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong>./src/app/app.component.html</strong>
+  in your editor and replace the
+  <strong>&lt;!-- TODO video panel --&gt;</strong>
+  with these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+    &lt;div class="video-panel" [style.grid-template-columns]="videoColumns"&gt;
+        &lt;div *ngFor="let video of videos | keyvalue"&gt;
+            &lt;video (loadedmetadata)="playVideo($event, video.key)" [srcObject]="video.value"&gt;&lt;/video&gt;
+            &lt;span&gt;{{video.key}}&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  We will need to write some CSS to achieve the grid layout. Open
+  <strong>./src/app/app.component.css</strong>
+  in your editor and add these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"css"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+.video-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-gap: 2px;
+}
+.video-panel&gt;div {
+    position: relative;
+}
+.video-panel&gt;div&gt;span {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    padding: 2px;
+    background: rgba(255, 255, 255, .5);
+}
+video {
+    width: 100%;
+    height: 100%;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The number of participants in the room is dynamic, so we will not able to define the number of columns in the CSS. We
+  will need to write some code to make the grid layout works for dynamic number of participants. Open
+  <strong>./src/app/app.component.ts</strong>
+  in your editor and add a
+  <strong>doLayout</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  videos: { [target: string]: MediaStream } = {};
+  videoColumns = '';
+
+  doLayout() {
+    const videoCount = Object.keys(this.videos).length;
+    const columnCount = videoCount ? Math.ceil(Math.sqrt(videoCount)) : 0;
+    this.videoColumns = '';
+    for (let i = 0; i &lt; columnCount; i++) {
+      this.videoColumns += 'auto ';
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Since we use CSS grid layout here, so we will be able to control the number of columns by manipulating the
+  <strong>grid-template-columns</strong>
+  style attribute, which is bound to the
+  <strong>videoColumns</strong>
+  field. This function will recalculate the number of columns when invoked.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  We want the video to start playing immediately after the video stream is assigned to it. We already bind the
+  <strong>loadedmetadate</strong>
+  event to the
+  <strong>playVideo</strong>
+  function in the .html file. Now open
+  <strong>./src/app/app.component.ts</strong>
+  file in your editor and add a
+  <strong>playVideo</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  playVideo(event: Event, target: string) {
+    const videoElement = event.target as HTMLVideoElement;
+    videoElement.muted = target == this.me;
+    videoElement.play();
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This function will only enable the audio from other participants. Lastly we will write some more CSS for other
+  components. Add these to the
+  <strong>./src/app/app.component.css</strong>
+  file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"css"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+.info-panel {
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    padding: 2px;
+    background: rgba(255, 255, 255, .5);
+}
+
+.message-panel {
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    text-align: right;
+}
+.message-list&gt;div {
+    margin-bottom: 5px;
+}
+.message-list&gt;div&gt;span {
+    padding: 2px;
+    background: rgba(255, 255, 255, .5);
+    border-radius: 2px;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will move the room information to the bottom left corner and the message chat box to the bottom right corner.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2. Write the logic to initiate the video call</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We will initiate the video call when we got the participant list from the server. Now open
+  <strong>./src/app/app.component.ts</strong>
+  file in your editor and replace the
+  <strong>processParticipantList</strong>
+  function to this:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private me: string;
+
+  private async processParticipantList(message: { you: string, all: string[]; }) {
+    this.me = message.you;
+    this.videos[this.me] = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    this.doLayout();
+    message.all.filter(t =&gt; t != this.me).forEach(t =&gt; this.offerVideo(t));
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Save your session ID.</li>
+  <li>Query permission to start the webcam video and store it in the video list.</li>
+  <li>Recalculate the grid layout.</li>
+  <li>Initiate the video call with all other participants.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  It means that you will initiate the video call when you join the room. The logic to initiate the call is in the
+  <strong>offerVideo</strong>
+  function. Add the function now:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private async offerVideo(target: string) {
+    const rtc = this.rtcList[target] = this.setupRtcPeerConnection(target);
+    const offer = await rtc.createOffer();
+    await rtc.setLocalDescription(offer);
+    this.ws.send(JSON.stringify({ type: 'video-offer', from: this.me, to: target, sdp: offer }));
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will create an offer from RTCPeerConnection and send it to the target participant as
+  <a href="https://en.wikipedia.org/wiki/Session_Description_Protocol">SDP</a>
+  . We don't need to know what is a SDP because RTCPeerConnection will handle it when the target participant receive it.
+  Now we add the handler for
+  <strong>video-offer</strong>
+  message to the
+  <strong>processWebSocketMessage</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      ...
+      case 'video-offer': this.processVideoOffer(message as any); break;
+      ...
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add the
+  <strong>processVideoOffer</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private async processVideoOffer(message: { from: string, sdp: any }) {
+    const target = message.from;
+    const rtc = this.setupRtcPeerConnection(target);
+    await rtc.setRemoteDescription(new RTCSessionDescription(message.sdp));
+    const answer = await rtc.createAnswer();
+    await rtc.setLocalDescription(answer);
+    this.ws.send(JSON.stringify({ type: 'video-answer', from: this.me, to: target, sdp: answer }));
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will store the video offer and create an answer to send it back to the participant who make the offer. Now we add
+  the handler for
+  <strong>video-answer</strong>
+  message to the
+  <strong>processWebSocketMessage</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      ...
+      case 'video-answer': this.processVideoAnswer(message as any); break;
+      ...
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add the
+  <strong>processVideoAnswer</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private async processVideoAnswer(message: { from: string, sdp: any }) {
+    const target = message.from;
+    const rtc = this.rtcList[target];
+    await rtc.setRemoteDescription(new RTCSessionDescription(message.sdp));
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:heading {"level":4} -->
+<h4>3. Write the logic to setup RTCPeerConnection</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Both the
+  <strong>offerVideo</strong>
+  function and the
+  <strong>processVideoOffer</strong>
+  function calls
+  <strong>setupRtcPeerConnection</strong>
+  to setup the RTCPeerConnection. Add the function like this:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private rtcList: { [target: string]: RTCPeerConnection } = {};
+
+  private setupRtcPeerConnection(target: string) {
+    const url = new URL(location.href);
+    const rtc = this.rtcList[target] = new RTCPeerConnection();
+    rtc.onicecandidate = ev =&gt; this.processRtcIceCandidate(target, ev);
+    rtc.ontrack = ev =&gt; this.processRtcTrack(target, ev);
+    const myVideo = this.videos[this.me];
+    myVideo.getTracks().forEach(t =&gt; rtc.addTrack(t, myVideo));
+    return rtc;
+  }
+
+  private processRtcIceCandidate(target: string, ev: RTCPeerConnectionIceEvent) {
+    if (ev.candidate) {
+      this.ws.send(JSON.stringify({ type: 'ice-candidate', from: this.me, to: target, candidate: ev.candidate }));
+    }
+  }
+
+  private processRtcTrack(target: string, ev: RTCTrackEvent) {
+    this.videos[target] = ev.streams[0];
+    this.doLayout();
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Setup the RTCPeerConnection with necessary handler.</li>
+  <li>Send the ICE candidate details to the target recipient.</li>
+  <li>If it receives a video track, add it to the videos list so it appear in the UI.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  We don't need to know what is an ICE candidate because the RTCPeerConnection will handle it. We need to add a handler
+  for
+  <strong>ice-candidate</strong>
+  message to the
+  <strong>processWebSocketMessage</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      ...
+      case 'ice-candidate': this.processIceCandidate(message as any); break;
+      ...
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add the
+  <strong>processIceCandidate</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processIceCandidate(message: { from: string, candidate: any }) {
+    const target = message.from;
+    this.rtcList[target].addIceCandidate(new RTCIceCandidate(message.candidate));
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:heading {"level":4} -->
+<h4>4. Write the logic to handle participant leaving</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We will need to remove the video from the UI if a participant leave. So we need to add the handler for
+  participant-leave message to the
+  <strong>processWebSocketMessage</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      ...
+      case 'participant-leave': this.processParticipantLeave(message as any); break;
+      ...
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add the
+  <strong>processParticipantLeave</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processParticipantLeave(message: { from: string }) {
+    const target = message.from;
+    delete this.videos[target];
+    delete this.rtcList[target];
+    this.doLayout();
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>This will remove the video from the list if a participant leave.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  The video call should be working now. You can try to open 2 browsers and connect to the same room. You should see the
+  browser showing 2 faces of you. If you want to use the video call on another device in the same network, you might
+  need to tweak your firewall to allow incoming connection. If you want to use it on the Internet, you might need to
+  tweak your router to allow port forwarding. It's better to use a STUN server and a TURN server to overcome all these
+  network problems.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next I will talk about the
+  <a href="https://c4compile.me/2020/07/30/make-a-video-conference-web-application-part-4-stun-and-turn/">
+    STUN and the TURN server
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

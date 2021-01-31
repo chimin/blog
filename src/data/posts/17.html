@@ -1,0 +1,499 @@
+<!-- wp:paragraph -->
+<p>
+  This is continued from
+  <a href="https://c4compile.me/2020/12/29/aws-cloudformation-01-create-a-web-server-ec2-instance/">
+    AWS CloudFormation: 01 – Create a web server EC2&nbsp;instance
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want to scale my web server horizontally.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What we need?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>A launch template to launch an EC2 instance when needed.</li>
+  <li>A load balancer to route traffic to multiple EC2 instances.</li>
+  <li>A auto scaling group to control the amount of running EC2 instances.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This is what we are going to do:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":449,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img
+      src="https://c4compile.files.wordpress.com/2020/12/template1-designer-1.png?w=1024"
+      alt=""
+      class="wp-image-449"
+    />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open
+  <strong>01-webserver-template.yaml</strong>
+  from previous post and save as
+  <strong>02-autoscaling-template.yaml</strong>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Network</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The load balancer requires multiple subnets, thus we need to create another subnet for our VPC. Modify these
+  resources:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicSubnet:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::Subnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrBlock:&nbsp;10.0.0.0/24
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AvailabilityZone:&nbsp;ap-southeast-1a
+            </span>
+          </code>
+        </td>
+        <td>Add the AvailabilityZone to the original subnet.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Then add these resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicSubnet2:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::Subnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrBlock:&nbsp;10.0.1.0/24
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AvailabilityZone:&nbsp;ap-southeast-1b
+          </code>
+        </td>
+        <td>This is the new subnet. The server instances in this subnet will have the IP of 10.0.1.*.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicSubnet2RouteTableAssociation:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::SubnetRouteTableAssociation
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RouteTableId:&nbsp;!Ref&nbsp;PublicRouteTable
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubnetId:&nbsp;!Ref&nbsp;PublicSubnet2
+          </code>
+        </td>
+        <td>Associate the route table to the new subnet.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Launch Template</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The auto scaling group will need to know how to launch an EC2 instance. This is defined as launch template in AWS. The
+  structure is very similar to how we define the EC2 instance in last port. Modify
+  <strong>WebServerInstance</strong>
+  into this
+  <strong>WebServerLaunchTemplate</strong>
+  :
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerLaunchTemplate:
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::LaunchTemplate
+            </span>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LaunchTemplateData:
+            </span>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ImageId:&nbsp;ami-0d728fd4e52be968f
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InstanceType:&nbsp;t2.micro
+          </code>
+        </td>
+        <td>The new EC2 instance will use Amazon Linux 2 and t2.micro like the EC2 instance in the previous post.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetworkInterfaces:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;DeviceIndex:&nbsp;"0"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssociatePublicIpAddress:&nbsp;true
+          </code>
+        </td>
+        <td>
+          This is the network interface of the EC2 instance. The auto scaling group will decide the subnet for the EC2
+          instance so we don't need to specify it here. It will have a public IP.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            <span class="has-inline-color has-vivid-green-cyan-color">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Groups:
+            </span>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerSecurityGroup
+          </code>
+        </td>
+        <td>
+          Associate it to the security group we defined earlier so we only expose the ports we need. Note that the
+          property name here is Groups instead of GroupSet.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyName:&nbsp;!Sub&nbsp;${SshKeyName}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UserData:&nbsp;!Base64&nbsp;|
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#!/usr/bin/env&nbsp;bash
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;yum&nbsp;update&nbsp;-y
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;amazon-linux-extras&nbsp;install&nbsp;-y&nbsp;nginx1
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;systemctl&nbsp;enable&nbsp;nginx
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;systemctl&nbsp;start&nbsp;nginx
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;DependsOn:&nbsp;InternetRoute
+          </code>
+        </td>
+        <td>The rest is just like what we did for the EC2 instance in the previous post.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Load Balancer</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The load balancer will route the traffic from the Internet to the EC2 instances. Add these resources:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerLoadBalancer:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::ElasticLoadBalancingV2::LoadBalancer
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SecurityGroups:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerSecurityGroup
+          </code>
+        </td>
+        <td>
+          This is the load balancer. It will accept the same web server traffic as the EC2 instances so we just use the
+          same security group as the EC2 instances. It doesn't handle SSH traffic.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subnets:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;PublicSubnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;PublicSubnet2
+          </code>
+        </td>
+        <td>It needs more than 1 subnet here to achieve high availability thus we defined 2 subnets for it.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerLoadBalancerTargetGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::ElasticLoadBalancingV2::TargetGroup
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Port:&nbsp;80
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocol:&nbsp;HTTP
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+          </code>
+        </td>
+        <td>
+          This is the target group of the load balancer. All the traffic will be routed to the port 80 of the EC2
+          instances in this target group. The auto scaling group will manage it.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TargetGroupAttributes:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Key:&nbsp;deregistration_delay.timeout_seconds
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;"30"
+          </code>
+        </td>
+        <td>
+          This is the time needed for a EC2 instance to deregister itself from the target group. This is needed so when
+          the auto scaling group terminate the EC2 instance, it still have enough time to process the active request.
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerLoadBalancerHttpListener:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::ElasticLoadBalancingV2::Listener
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LoadBalancerArn:&nbsp;!Ref&nbsp;WebServerLoadBalancer
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Port:&nbsp;80
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocol:&nbsp;HTTP
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DefaultActions:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Type:&nbsp;forward
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TargetGroupArn:&nbsp;!Ref&nbsp;WebServerLoadBalancerTargetGroup
+          </code>
+        </td>
+        <td>
+          This is the listener of the load balancer. It will accept the HTTP request on port 80 and forwards it to the
+          corresponding target group.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Auto Scaling Group</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  The auto scaling group will change the number of running EC2 instances on the fly. It can do that manually or through
+  some predefined condition (aka auto scaling). Add this to the resources:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerAutoScalingGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::AutoScaling::AutoScalingGroup
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LaunchTemplate:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version:&nbsp;!Sub&nbsp;${WebServerLaunchTemplate.LatestVersionNumber}
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LaunchTemplateId:&nbsp;!Ref&nbsp;WebServerLaunchTemplate
+          </code>
+        </td>
+        <td>
+          This is the auto scaling group. It will use the launch template we defined earlier to launch a new EC2
+          instance.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MinSize:&nbsp;1
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MaxSize:&nbsp;2
+          </code>
+        </td>
+        <td>It will ensure the number of running EC2 instances will be between 1 and 2.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VPCZoneIdentifier:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;PublicSubnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;PublicSubnet2
+          </code>
+        </td>
+        <td>It will launch the EC2 instances in these subnets.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TargetGroupARNs:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerLoadBalancerTargetGroup
+          </code>
+        </td>
+        <td>It will register the EC2 instances in this target group so the load balancer can route traffic to them.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Output</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  There are multiple EC2 instances now so we can't rely on the IP of the EC2 instances to access our web server. We need
+  to use the DNS name of the load balancer. Change the outputs to this:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          &nbsp;&nbsp;Url:
+          <br />
+          &nbsp;&nbsp;&nbsp;&nbsp;Description:&nbsp;URL&nbsp;of&nbsp;the&nbsp;web&nbsp;server&nbsp;instance
+          <br />
+          &nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;!Sub&nbsp;http://${WebServerLoadBalancer.DNSName}
+        </td>
+        <td>This will construct a HTTP URL from the DNS name of the load balancer.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>
+  You can update the stack created in previous post with this stack. The CloudFormation will figure out the changes and
+  know how to modify the existing resources and provision new resources.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Open the URL in a browser and you should see the NGINX welcome page. It might takes a while for the page to work
+  because it takes time to spin up the EC2 instance.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will do
+  <a href="https://c4compile.me/2021/01/16/aws-cloudformation-03-collect-logs/">
+    AWS CloudFormation: 03 – Collect logs
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

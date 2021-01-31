@@ -1,0 +1,438 @@
+<!-- wp:paragraph -->
+<p>
+  This is continue from
+  <a href="https://c4compile.me/2020/06/27/make-a-video-conference-web-application-part-1-signaling-server/">part 1</a>
+  .
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Browser Application</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4>1. Setup Angular</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Setup a Angular project from scratch by running these commands in an empty directory:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+echo {} &gt; package.json
+npm i @angular/cli -D
+npx ng new blow-water-ui --directory . --force --defaults</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>To make sure everything is working fine, run this command to start the browser application:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"bash"} -->
+<pre class="wp-block-syntaxhighlighter-code">npm start</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  You should see the message
+  <strong>open your browser on http://localhost:4200/</strong>
+  . Open the URL in your browser. You should see a sample Angular application.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>2. Design the JOIN ROOM PAGE</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We need a page to prompt for room number and a page to host the video conference. First we will add in some required
+  modules to the project. Open
+  <strong>./src/app/app.module.ts</strong>
+  in your editor. Add the import to the top of the file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">import { FormsModule } from '@angular/forms';</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Add
+  <strong>FormsModule</strong>
+  to the module imports section:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+@NgModule({
+  ...
+  imports: [
+    ...
+    FormsModule
+  ],
+  ...
+})</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we can start design our UI. We will design the prompt page first. Open
+  <strong>./src/app/app.component.html</strong>
+  in your editor. Remove everything inside and replace with these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"xml"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+&lt;div *ngIf="page == 'setup'"&gt;
+    &lt;div&gt;Please enter the room name&lt;/div&gt;
+    &lt;input type="text" [(ngModel)]="room" (keydown.enter)="join()" /&gt;
+&lt;/div&gt;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will create a label and a textbox for the participant to enter the room number. Participant will join the room
+  when press Enter in the textbox. The page will be shown only the
+  <strong>page</strong>
+  variable is
+  <strong>setup</strong>
+  . By changing the
+  <strong>page</strong>
+  variable, we can create a simple mechanism to show different Angular component as different page.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will write the logic behind this. Open
+  <strong>./src/app/app.component.ts</strong>
+  in your editor and replace the content in the
+  <strong>AppComponent</strong>
+  class with these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+export class AppComponent {
+  page = 'setup';
+  room: string;
+
+  private ws: WebSocket;
+
+  join() {
+    const url = new URL(location.href);
+    this.ws = new WebSocket(`${url.protocol.replace(/^http/, 'ws')}//${url.host}/room/${this.room}`);
+    this.ws.onmessage = ev =&gt; this.processWebSocketMessage(JSON.parse(ev.data));
+    this.page = 'room';
+    document.body.style.background = '#000';
+  }
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This defines the variables needed for the prompt page. The
+  <strong>join</strong>
+  function is invoked when the participant press Enter in the textbox. The
+  <strong>join</strong>
+  function will
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>Construct the URL to the signaling server from the current address.</li>
+  <li>Connect to the signaling server via WebSocket.</li>
+  <li>
+    Set the message handler to
+    <strong>processWebSocketMessage</strong>
+    function.
+  </li>
+  <li>
+    Change the
+    <strong>page</strong>
+    to
+    <strong>room</strong>
+    .
+  </li>
+  <li>Set the background color to black.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will create the
+  <strong>processWebSocketMessage</strong>
+  function. Add these after the
+  <strong>join</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      case 'participant-list': this.processParticipantList(message as any); break;
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will handle all the message based on the
+  <strong>type</strong>
+  field. For now we only handle
+  <strong>participant-list</strong>
+  message. Once connected to the signaling server, the server will send the
+  <strong>participant-list</strong>
+  message to the client. That will invoke the
+  <strong>processParticipantList</strong>
+  function.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  To make sure everything is working fine, we can create a simple
+  <strong>processParticipantList</strong>
+  function to dump the message to the browser. We will put in the real implementation later. Add the function like this:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processParticipantList(message: any) {
+    document.body.style.background = '';
+    document.body.innerText = JSON.stringify(message);
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  We will need to make sure the Angular project is hosted by the signaling server for it to construct the correct
+  WebSocket URL because we set the WebSocket to connect to the same server that host the Angular application.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":89,"sizeSlug":"large"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/06/untitled-diagram-2.png?w=641" alt="" class="wp-image-89" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  We cannot use
+  <strong>ng serve</strong>
+  to run the Angular project. Instead we compile it into the
+  <strong>./web</strong>
+  directory of the signaling server:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">npx ng build --watch --output-path &lt;signaling server&gt;\web</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The
+  <strong>--watch</strong>
+  argument is to instruct the Angular CLI to rebuild when there's any file changes so you don't have to run this command
+  manually to compile the project. Start the signaling server and open
+  <strong>http://localhost:8080</strong>
+  in the browser. Enter any room number and press enter. You should see a
+  <strong>participant-list</strong>
+  JSON payload in the browser. If you open a new browser and join the same room, you will see the participant list
+  contains more entries.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>3. Design the message chat box</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  We will design the UI for the video conference before going into the logic. Open
+  <strong>./src/app/app.component.html</strong>
+  in your editor. Add these at the end of the file:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+&lt;div *ngIf="page == 'room'"&gt;
+    &lt;!-- TODO video panel --&gt;
+    &lt;div class="info-panel"&gt;
+        Room {{room}}
+    &lt;/div&gt;
+    &lt;!-- TODO message panel --&gt;
+&lt;/div&gt;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will create a page that only appear if
+  <strong>page</strong>
+  variable is
+  <strong>room</strong>
+  . It will also show the room number.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Now we add the message panel to the page so the participant can chat via text message. Replace the
+  <strong>&lt;!-- TODO message panel --&gt;</strong>
+  block with these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+    &lt;div class="message-panel"&gt;
+        &lt;div class="message-list"&gt;
+            &lt;div *ngFor="let message of messages"&gt;&lt;span&gt;{{message}}&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="message-input"&gt;
+            &lt;input type="text" [(ngModel)]="input" (keydown.enter)="send()" placeholder="Message..." /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will create a list of messages and a textbox for sending message to other participants. The participant can send
+  the text message by pressing Enter in the textbox.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will write the logic behind this. Open
+  <strong>./src/app/app.component.ts</strong>
+  in your editor and add these to the
+  <strong>AppComponent</strong>
+  class:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  messages: string[] = [];
+  input: string;
+
+  send() {
+    if (this.input) {
+      this.ws.send(JSON.stringify({ type: 'text-message', from: this.me, content: this.input }));
+      this.input = '';
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  The
+  <strong>send</strong>
+  function will be invoked when the participant press Enter in the textbox. It will send a
+  <strong>text-message</strong>
+  message together with the content to all the participants in the room. The other participants will need to handle this
+  message to show it in the browser.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Modify
+  <strong>processWebSocketMessage</strong>
+  function to redirect
+  <strong>text-message</strong>
+  to
+  <strong>processTextMessage</strong>
+  function:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processWebSocketMessage(message: { type: string }) {
+    switch (message.type) {
+      ...
+      case 'text-message': this.processTextMessage(message as any); break;
+      ...
+    }
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Add
+  <strong>processTextMessage</strong>
+  function after the
+  <strong>send</strong>
+  function to handle the
+  <strong>text-message</strong>
+  message:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+  private processTextMessage(message: { from: string, content: string }) {
+    this.messages.push(`[${message.from}] ${message.content}`);
+    setTimeout(() =&gt; this.messages.shift(), 5000);
+  }</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will push the text message context into the message list so it will appear in the UI. It also remove it after 5
+  seconds so it doesn't clutter the screen. This is a video conference web application. The UI will be filled with the
+  face of the participants. I don't want to cover it with text messages.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  To make sure everything is working fine, we replace the
+  <strong>processParticipantList</strong>
+  function with empty body so it doesn't clear the browser content. If you are using
+  <strong>--watch</strong>
+  argument to build the Angular project, you should be able to see the latest changes by just refreshing the browser.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Now you should be able to text everyone in the same room.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next I will talk about the
+  <a href="https://c4compile.me/2020/07/18/make-a-video-conference-web-application-part-3-video-call/">
+    video conferencing capability
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

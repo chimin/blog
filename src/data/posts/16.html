@@ -1,0 +1,519 @@
+<!-- wp:heading -->
+<h2>Background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want a web server.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What we need?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol>
+  <li>
+    A subnet with CIDR block of 10.0.0.0/24 so my web server instances will always fall in a predefined range, then I
+    can safely assume all traffic that comes from 10.0.0.0/24 is from my internal network. It's very useful if we have
+    multiple server instances.
+  </li>
+  <li>An internet gateway so my web server instance can be exposed to the world.</li>
+  <li>A security group so only certain ports are exposed to the world.</li>
+  <li>A EC2 instance which is hosting my web server.</li>
+</ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2>How to do it?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This is what we are going to do:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":425,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/12/image.png?w=1024" alt="" class="wp-image-425" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  We will use CloudFormation to do it. Create a
+  <strong>01-webserver-template.yaml</strong>
+  file with these contents:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+Parameters:
+Outputs:</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This is the basic structure of a CloudFormation file. It can be a JSON file or a YAML file. I'm using YAML format
+  here.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Network</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  First we setup the VPC for our web servers. Add these to the
+  <strong>Resources</strong>
+  section:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;InternetGateway:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::InternetGateway
+          </code>
+        </td>
+        <td>This is the Internet gateway. It's needed so our web server can be accessible from the Internet.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;VPC:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::VPC
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrBlock:&nbsp;10.0.0.0/16
+          </code>
+        </td>
+        <td>
+          This is the VPC. The CidrBlock will be 10.0.0.0/16 so we can add subnet with CidrBlock 10.0.0.0/24 later.
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;VPCInternetGatewayAttachment:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::VPCGatewayAttachment
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InternetGatewayId:&nbsp;!Ref&nbsp;InternetGateway
+          </code>
+        </td>
+        <td>This is attached the Internet gateway to the VPC.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicSubnet:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::Subnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrBlock:&nbsp;10.0.0.0/24
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+          </code>
+        </td>
+        <td>This is the subnet. The server instances in this subnet will have the IP of 10.0.0.*.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicRouteTable:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::RouteTable
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+          </code>
+        </td>
+        <td>
+          This is the route table. It determines the destination of the traffic, for example any traffic targeting
+          10.0.*.* should go to the server instances within the VPC.
+        </td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;PublicSubnetRouteTableAssociation:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::SubnetRouteTableAssociation
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RouteTableId:&nbsp;!Ref&nbsp;PublicRouteTable
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubnetId:&nbsp;!Ref&nbsp;PublicSubnet
+          </code>
+        </td>
+        <td>Associate the route table to the subnet.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;InternetRoute:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::Route
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RouteTableId:&nbsp;!Ref&nbsp;PublicRouteTable
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GatewayId:&nbsp;!Ref&nbsp;InternetGateway
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DestinationCidrBlock:&nbsp;0.0.0.0/0
+          </code>
+        </td>
+        <td>
+          This is the route for the Internet. Any traffic that isn't targetting 10.0.*.* will go to the Internet, as
+          determined by the DestinationCidrBlock of 0.0.0.0/0.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Web server</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we setup the EC2 instances to run a web server. Add these to the
+  <strong>Resources</strong>
+  section:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerSecurityGroup:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::SecurityGroup
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GroupDescription:&nbsp;Allow&nbsp;all&nbsp;HTTP&nbsp;traffic
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VpcId:&nbsp;!Ref&nbsp;VPC
+          </code>
+        </td>
+        <td>
+          This is the security group for our web server. It's a Firewall that decide what ports are exposed to the
+          public.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SecurityGroupIngress:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;IpProtocol:&nbsp;TCP
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FromPort:&nbsp;80
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ToPort:&nbsp;80
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrIp:&nbsp;0.0.0.0/0
+          </code>
+        </td>
+        <td>We needs the port 80 for the web server.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;IpProtocol:&nbsp;TCP
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FromPort:&nbsp;22
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ToPort:&nbsp;22
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CidrIp:&nbsp;!Sub&nbsp;${SshAllowCidrIp}
+          </code>
+        </td>
+        <td>
+          The port 22 is for the SSH access. SSH is optional but it's useful in case you want to troubleshoot the EC2
+          instance. The security group only allows the traffic from with IP of SshAllowCidrIp. The parameter will be
+          defined later.
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;WebServerInstance:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;AWS::EC2::Instance
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Properties:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ImageId:&nbsp;ami-0d728fd4e52be968f
+          </code>
+        </td>
+        <td>
+          This is the EC2 instance to run the web server. The ImageId here refers to the Amazon Linux AMI in
+          ap-southeast region. Each region has a different ID for the AMI. You can find it when you launching a new
+          instance from the AWS console.
+          <br />
+          <img
+            class="wp-image-419"
+            style="width: 500px"
+            src="https://c4compile.files.wordpress.com/2020/12/2020-12-29-16_23_02-launch-instance-wizard-_-ec2-management-console-personal-microsofte2808b-edge.png"
+            alt=""
+          />
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InstanceType:&nbsp;t2.micro</code></td>
+        <td>We use t2.micro here because it's entitled to the free tier.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetworkInterfaces:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;DeviceIndex:&nbsp;"0"
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubnetId:&nbsp;!Ref&nbsp;PublicSubnet
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssociatePublicIpAddress:&nbsp;true
+          </code>
+        </td>
+        <td>
+          This is the network interface of the EC2 instance. It's in the subnet we defined earlier so it will have the
+          IP of 10.0.0.*. It will also have a public IP.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GroupSet:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;!Ref&nbsp;WebServerSecurityGroup
+          </code>
+        </td>
+        <td>Associate it to the security group we defined earlier so we only expose the ports we need.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyName:&nbsp;!Sub&nbsp;${SshKeyName}</code></td>
+        <td>Set the private key required to access the EC2 instance via SSH. The parameter will defined later.</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <code>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UserData:&nbsp;!Base64&nbsp;|
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#!/usr/bin/env&nbsp;bash
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;yum&nbsp;update&nbsp;-y
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;amazon-linux-extras&nbsp;install&nbsp;-y&nbsp;nginx1
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;systemctl&nbsp;enable&nbsp;nginx
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sudo&nbsp;systemctl&nbsp;start&nbsp;nginx
+          </code>
+        </td>
+        <td>
+          This is the shell script that will be executed when the EC2 instance if first created. It will install the
+          required package to run a NGINX web server. The property expects a base64 encoded string so we need to use the
+          AWS intrinsic function Base64 to encode it.
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>&nbsp;&nbsp;&nbsp;&nbsp;DependsOn:&nbsp;InternetRoute</code></td>
+        <td>
+          The EC2 instance required the Internet route to be created. AWS will automatically figure out the dependencies
+          if we use !Ref to reference the component but this InternetRoute is not referenced with !Ref anywhere, so we
+          need to manually declare the dependency here.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Parameters</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  Add these to the
+  <strong>Parameters</strong>
+  section:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;SshAllowCidrIp:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;String
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Default:&nbsp;0.0.0.0/0
+          </code>
+        </td>
+        <td>This is the IP that is allowed to SSH into our web server instance. Default to allow all.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;SshKeyName:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;String
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Default:&nbsp;chimin
+          </code>
+        </td>
+        <td>
+          This is the private key needed to SSH into our web server instance. You can create one in EC2 &gt; Network
+          &amp; Security &gt; Key Pairs page:
+          <br />
+          <img
+            class="wp-image-435"
+            style="width: 500px"
+            src="https://c4compile.files.wordpress.com/2020/12/2020-12-29-16_35_33-key-pairs-_-ec2-management-console-personal-microsofte2808b-edge-1.png"
+            alt=""
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>The AWS console will prompt you the parameter when you upload your template:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":430,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/12/image-1.png?w=1017" alt="" class="wp-image-430" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Output</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>
+  After provision all the components, we want to have the public IP of the web server instance so we can access it from
+  the Internet. CloudFormation allows us to bind the properties of a component as an output so we don't have to dig
+  inside the components to find it. Add these to the
+  <strong>Output</strong>
+  section:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table">
+  <table>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>
+          <code>
+            &nbsp;&nbsp;Url:
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Description:&nbsp;URL&nbsp;of&nbsp;the&nbsp;web&nbsp;server&nbsp;instance
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Value:&nbsp;!Sub&nbsp;http://${WebServerInstance.PublicIp}
+          </code>
+        </td>
+        <td>This will construct a HTTP URL from the IP of the web server instance.</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>The AWS console will show all the outputs here:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":439,"sizeSlug":"large","linkDestination":"none"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/12/image-5.png?w=960" alt="" class="wp-image-439" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  Open the URL in a browser and you should see the NGINX welcome page. It might takes a while for the page to work
+  because it takes time to spin up an EC2 instance.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  You can delete the stack after you done playing with it. It will delete all the resources belong to this
+  CloudFormation stack. Squishy clean.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will do
+  <a href="https://c4compile.me/2021/01/13/aws-cloudformation-02-create-an-auto-scaling-group/">
+    AWS CloudFormation: 02 – Create an auto scaling group
+  </a>
+  .
+</p>
+<!-- /wp:paragraph -->

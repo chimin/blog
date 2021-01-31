@@ -1,0 +1,291 @@
+<!-- wp:paragraph -->
+<p>
+  This is continued from
+  <a href="https://c4compile.me/2020/09/12/make-a-note-taking-app-with-firestore-part-1-google-authentication/">
+    Make a note taking app with Firestore – Part 1 Google&nbsp;authentication
+  </a>
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>
+  What is
+  <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
+  ?
+</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>When you type this</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code">
+# This is a title
+
+This is the content...</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>It will be displayed as</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"align":"center","id":234,"sizeSlug":"large"} -->
+<div class="wp-block-image">
+  <figure class="aligncenter size-large">
+    <img src="https://c4compile.files.wordpress.com/2020/09/image-5.png?w=250" alt="" class="wp-image-234" />
+  </figure>
+</div>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>
+  So you can have a rich text content without knowing complex HTML. It's much better and simpler than all the HTML rich
+  text editor out there, which is based on HTML.
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What to do?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3>1. Install the Markdown Editor library</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Run these commands:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+npm i simplemde
+npm i -D @types/simplemde</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  This will install the
+  <strong>simplemde</strong>
+  library and the type definitions for Typescript into your project. Next we will update the HomePanel so it display a
+  header panel and a editor area. Replace
+  <strong>./src/components/HomePanel.tsx</strong>
+  with these:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import './HomePanel.css';
+
+import React from 'react';
+
+import EditPanel from './EditPanel';
+import ProfilePanel from './ProfilePanel';
+
+const HomePanel = () =&gt; {
+    return (
+        &lt;div&gt;
+            &lt;div className="content-panel"&gt;
+                &lt;EditPanel /&gt;
+            &lt;/div&gt;
+            &lt;div className="topbar"&gt;
+                &lt;div className="container"&gt;
+                    &lt;div className="title"&gt;Write it down&lt;/div&gt;
+                    &lt;ProfilePanel /&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default HomePanel;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we have to style it so the header panel is at the top and the editor will fill the remaining area. Create
+  <strong>./src/components/HomePanel.css</strong>
+  and put these in:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"css"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+.topbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    background: #ddd;
+    height: 2.5em;
+}
+
+.topbar&gt;.container {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translate(0, -50%);
+}
+
+.topbar .title {
+    display: inline-block;
+    padding: .5em;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.content-panel {
+    position: fixed;
+    left: 0;
+    top: 2.5em;
+    right: 0;
+    bottom: 0;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will add the ProfilePanel, which will show the logged in user name and a logout button. Create
+  <strong>./src/components/ProfilePanel.tsx</strong>
+  and put these in:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import './ProfilePanel.css';
+
+import React, { useContext } from 'react';
+
+import LoggedInContext from '../contexts/LoggedInContext';
+
+const ProfilePanel = () =&gt; {
+    const loggedIn = useContext(LoggedInContext);
+
+    return (
+        &lt;div className="profile-panel"&gt;
+            &lt;span className="greeting"&gt;Welcome, &lt;span className="username"&gt;{loggedIn.user?.displayName}&lt;/span&gt;&lt;/span&gt;
+            &lt;button type="button" onClick={loggedIn.clear}&gt;Logout&lt;/button&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default ProfilePanel;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add some stylings to it so it's displayed nicely. Create
+  <strong>./src/components/ProfilePanel.css</strong>
+  and put these in:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"css"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+.profile-panel {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    padding: .5em;
+}
+
+.profile-panel&gt;.username {
+    font-weight: bold;
+}
+
+.profile-panel&gt;button {
+    margin-left: .5em;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will display the Markdown Editor using
+  <strong>simplemde</strong>
+  library. Create
+  <strong>./src/components/EditPanel.tsx</strong>
+  and put these in:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"jscript"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+import '../../node_modules/simplemde/debug/simplemde.css';
+import './EditPanel.css';
+
+import React, { useEffect, useRef } from 'react';
+import SimpleMDE from 'simplemde';
+
+const EditPanel = () =&gt; {
+    const ref = useRef&lt;HTMLTextAreaElement&gt;(null);
+
+    useEffect(() =&gt; {
+        const editor = new SimpleMDE({
+            element: ref.current!,
+            autofocus: true,
+            toolbar: false,
+            status: false,
+        });
+
+        return () =&gt; {
+            editor.toTextArea();
+        };
+    });
+
+    return (
+        &lt;div className="edit-panel"&gt;
+            &lt;textarea ref={ref}&gt;&lt;/textarea&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default EditPanel;</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Then we add some styling to it and the editor will fill the container area. Create
+  <strong>./src/components/EditPanel.css</strong>
+  and put these in:
+</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"css"} -->
+<pre class="wp-block-syntaxhighlighter-code">
+.edit-panel {
+    width: 100%;
+    height: 100%;
+}
+
+.edit-panel&gt;.CodeMirror {
+    width: 100%;
+    height: 100%;
+}</pre
+>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>Now it's done. You can run this command to test everything:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:syntaxhighlighter/code {"language":"powershell"} -->
+<pre class="wp-block-syntaxhighlighter-code">npm start</pre>
+<!-- /wp:syntaxhighlighter/code -->
+
+<!-- wp:paragraph -->
+<p>
+  Next we will do
+  <a href="https://c4compile.me/2020/09/26/make-a-note-taking-app-with-firestore-part-1-3-firestore/">
+    Make a note taking app with Firestore – Part 1.3 Firestore
+  </a>
+</p>
+<!-- /wp:paragraph -->
