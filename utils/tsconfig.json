@@ -4,6 +4,6 @@
         "isolatedModules": false,
         "lib": [],
         "moduleResolution": "node",
-        "target": "ESNext"
+        "target": "ES2019"
     }
 }

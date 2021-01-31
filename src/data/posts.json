@@ -1,0 +1,189 @@
+[
+  {
+    "id": 1,
+    "title": "Make a QR code URL generator Chrome extension",
+    "publishDate": "2020-05-02T04:15:31.000Z",
+    "tags": [
+      "Chrome",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Make a JSON formatter Chrome extension",
+    "publishDate": "2020-05-07T08:31:10.000Z",
+    "tags": [
+      "Chrome",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Make a video conference web application - Part 1: Signaling server",
+    "publishDate": "2020-06-27T14:46:22.000Z",
+    "tags": [
+      "NodeJS",
+      "Typescript",
+      "WebRTC"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Make a video conference web application - Part 2: Browser application",
+    "publishDate": "2020-07-05T02:06:39.000Z",
+    "tags": [
+      "Angular",
+      "Typescript",
+      "WebRTC"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Make a video conference web application - Part 3: Video call",
+    "publishDate": "2020-07-18T15:03:46.000Z",
+    "tags": []
+  },
+  {
+    "id": 6,
+    "title": "Make a video conference web application - Part 4: STUN and TURN",
+    "publishDate": "2020-07-30T14:36:38.000Z",
+    "tags": []
+  },
+  {
+    "id": 7,
+    "title": "Make a note taking app with Firestore - Part 1.1 Google authentication",
+    "publishDate": "2020-09-12T13:58:30.000Z",
+    "tags": [
+      "ReactJS",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Make a note taking app with Firestore - Part 1.2 Markdown editor",
+    "publishDate": "2020-09-19T12:45:05.000Z",
+    "tags": [
+      "ReactJS",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Make a note taking app with Firestore - Part 1.3 Firestore",
+    "publishDate": "2020-09-26T07:20:55.000Z",
+    "tags": [
+      "ReactJS",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Make a note taking app with Firestore – Part 2.1 Mobile application",
+    "publishDate": "2020-10-10T12:48:02.000Z",
+    "tags": [
+      "ReactNative",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Make a note taking app with Firestore – Part 2.2 Text editor",
+    "publishDate": "2020-10-18T02:57:49.000Z",
+    "tags": [
+      "ReactNative",
+      "Typescript"
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Performance of different web application framework",
+    "publishDate": "2020-11-01T07:24:56.000Z",
+    "tags": [
+      ".NET Core",
+      "Java",
+      "Kotlin",
+      "Spring Boot"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Lerna to manage multiple modules - Site killer extension for Chrome and Firefox - Part 1",
+    "publishDate": "2020-11-07T07:21:22.000Z",
+    "tags": [
+      "Typescript"
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Lerna to manage multiple modules – Site killer extension for Chrome and Firefox – Part 2",
+    "publishDate": "2020-11-14T04:18:23.000Z",
+    "tags": [
+      "Typescript"
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Lerna to manage multiple modules – Site killer extension for Chrome and Firefox – Part 3",
+    "publishDate": "2020-11-22T05:16:04.000Z",
+    "tags": [
+      "Typescript"
+    ]
+  },
+  {
+    "id": 16,
+    "title": "AWS CloudFormation: 01 - Create a web server EC2 instance",
+    "publishDate": "2020-12-29T13:15:52.000Z",
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
+  },
+  {
+    "id": 17,
+    "title": "AWS CloudFormation: 02 - Create an auto scaling group",
+    "publishDate": "2021-01-13T15:56:27.000Z",
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
+  },
+  {
+    "id": 18,
+    "title": "AWS CloudFormation: 03 - Collect logs",
+    "publishDate": "2021-01-16T13:10:48.000Z",
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
+  },
+  {
+    "id": 19,
+    "title": "AWS CloudFormation: 04 - Build and deploy pipeline",
+    "publishDate": "2021-01-23T14:11:41.000Z",
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
+  },
+  {
+    "id": 20,
+    "title": "AWS CloudFormation: 05 - Create a web server Docker instance",
+    "publishDate": "2021-01-30T07:33:50.000Z",
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
+  },
+  {
+    "id": 21,
+    "title": "AWS CloudFormation: 06 - Collect logs from Docker instance",
+    "publishDate": null,
+    "tags": []
+  },
+  {
+    "id": 22,
+    "title": "AWS CloudFormation: 07 – Build and deploy pipeline for Docker instance",
+    "publishDate": null,
+    "tags": []
+  }
+]

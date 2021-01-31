@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } from 'next';
+import { getPostContent, listPosts } from '../../app/posts';
 
 export default function Post(props) {
     return (
@@ -9,16 +10,14 @@ export default function Post(props) {
 }
 
 export function getStaticProps(content: GetStaticPropsContext): GetStaticPropsResult<any> {
-    const dataDirectory = path.resolve('src/data/posts');
-    const data = fs.readFileSync(path.join(dataDirectory, `${content.params.id}.html`), 'utf8');
+    const data = getPostContent(content.params.id);
     return { props: { data } };
 }
 
 export function getStaticPaths(): GetStaticPathsResult {
-    const postsDirectory = path.resolve('src/data/posts');
-    const posts = fs.readdirSync(postsDirectory).map(f => f.replace(/\..*$/, ''));
+    const posts = listPosts();
     return {
-        paths: posts.map(post => ({ params: { id: post } })),
+        paths: posts.map(post => ({ params: { id: String(post.id) } })),
         fallback: false
     };
 }

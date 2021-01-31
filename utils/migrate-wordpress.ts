@@ -6,11 +6,13 @@ import prettier from 'prettier';
 import cheerio from 'cheerio';
 import fetch from 'node-fetch';
 import { URL } from 'url';
+import moment from 'moment';
 
 (async () => {
-    const { inputFile, outputDirectory, assetDirectory, assetPublicPath, initialId } = commandLineArgs([
+    const { inputFile, outputDirectory, outputManifestFile, assetDirectory, assetPublicPath, initialId } = commandLineArgs([
         { name: 'inputFile', type: String },
         { name: 'outputDirectory', type: String },
+        { name: 'outputManifestFile', type: String },
         { name: 'assetDirectory', type: String },
         { name: 'assetPublicPath', type: String },
         { name: 'initialId', type: Number, defaultValue: 1 }
@@ -23,6 +25,7 @@ import { URL } from 'url';
         }
     };
 
+    const posts = [];
     const xml = xmlParser.parse(fs.readFileSync(inputFile, 'utf8'));
     for (const item of xml.rss.channel.item) {
         if (item['wp:post_type'] != 'post') {
@@ -30,6 +33,13 @@ import { URL } from 'url';
         }
 
         const postId = idGenerator.next();
+        const postCategories = Array.isArray(item['category']) ? item['category'] : [item['category']];
+        posts.push({
+            id: postId,
+            title: item['title'],
+            publishDate: moment(item['pubDate']),
+            tags: postCategories.filter(c => c != 'Uncategorized')
+        });
 
         const originalContent = item['content:encoded'];
         const $ = cheerio.load(originalContent);
@@ -70,4 +80,6 @@ import { URL } from 'url';
         console.log(`Generate ${fileName}`);
         fs.writeFileSync(filePath, formattedContent);
     }
+
+    fs.writeFileSync(outputManifestFile, JSON.stringify(posts, undefined, 2));
 })();
