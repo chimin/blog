@@ -1,0 +1,27 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+
+  .title a {
+    color: #fff;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: 1.5em;
+    display: inline-block;
+  }
+
+  .sub {
+    color: #ddd;
+    margin-top: 0.6em;
+    font-size: 0.8em;
+  }
+}
+
+.main-wrapper {
+  margin-top: 50px;
+}

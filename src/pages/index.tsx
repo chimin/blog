@@ -1,8 +1,4 @@
-import Head from 'next/head'
 import Link from 'next/link'
-import styles from '../styles/Home.module.css'
-import fs from 'fs';
-import path from 'path';
 import { GetStaticPropsResult } from 'next';
 import { listPosts } from '../app/posts';
 
