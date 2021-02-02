@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "next export",
+    "deploy": "firebase deploy",
     "start": "next start",
     "test": "jasmine-ts --config=jasmine.json --project src/specs/tsconfig.json",
     "lint": "eslint src/**/*.ts src/**/*.tsx utils/**/*.ts",

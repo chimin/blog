@@ -1,7 +1,7 @@
 import { mkdirSync, rmdirSync, writeFileSync } from 'fs';
 import * as webdriver from 'selenium-webdriver';
 
-const screenshotsDirectory = 'out/screenshots';
+const screenshotsDirectory = 'test/screenshots';
 
 jasmine.getEnv().addReporter({
     jasmineStarted() {
