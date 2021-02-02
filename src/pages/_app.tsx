@@ -2,8 +2,34 @@ import Head from 'next/head';
 import Link from 'next/link';
 import '../styles/scss/theme-7.scss'
 import '../styles/overrides.scss'
+import { useEffect } from 'react';
+import firebase from 'firebase/app';
+import 'firebase/analytics';
+
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    try {
+      if (firebase.app()) {
+        return;
+      }
+    } catch (e) {
+      return;
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCNXB6sOLfj7jE55MAhZMOKnAt-x9InnEc",
+      authDomain: "c4compile-2f38c.firebaseapp.com",
+      projectId: "c4compile-2f38c",
+      storageBucket: "c4compile-2f38c.appspot.com",
+      messagingSenderId: "195656641927",
+      appId: "1:195656641927:web:07b0a048ce726a3ecef722",
+      measurementId: "G-VH2DH3NLHL"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  }, []);
+
   return (
     <>
       <Head>
