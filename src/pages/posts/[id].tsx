@@ -1,17 +1,24 @@
-import path from 'path';
-import fs from 'fs';
+import Head from 'next/head';
 import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } from 'next';
 import { getPostContent, listPosts } from '../../app/posts';
+import { CommentBox } from '../../app/comps/CommentBox';
 
 export default function Post(props) {
     return (
-        <div dangerouslySetInnerHTML={{ __html: props.data }} />
+        <>
+            <Head>
+                <title>{props.title} - c4compile</title>
+            </Head>
+            <div dangerouslySetInnerHTML={{ __html: props.data }} />
+            <CommentBox />
+        </>
     );
 }
 
 export function getStaticProps(content: GetStaticPropsContext): GetStaticPropsResult<any> {
+    const metadata = listPosts().find(post => post.id == content.params.id);
     const data = getPostContent(content.params.id);
-    return { props: { data } };
+    return { props: { title: metadata.title, data } };
 }
 
 export function getStaticPaths(): GetStaticPathsResult {
