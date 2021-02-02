@@ -13,6 +13,6 @@ export default function Home(props) {
 }
 
 export function getStaticProps(): GetStaticPropsResult<any> {
-  const posts = listPosts().reverse();
+  const posts = listPosts().slice(0).reverse();
   return { props: { posts } };
 }
