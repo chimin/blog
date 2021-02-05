@@ -3,7 +3,9 @@
         "esModuleInterop": true,
         "isolatedModules": false,
         "lib": [],
+        "module": "CommonJS",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "target": "ES2019"
     }
 }

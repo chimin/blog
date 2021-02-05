@@ -20,6 +20,15 @@
     margin-top: 0.6em;
     font-size: 0.8em;
   }
+
+  .nav {
+    position: absolute;
+    right: 20px;
+
+    a {
+      color: #fff;
+    }
+  }
 }
 
 .main-wrapper {
