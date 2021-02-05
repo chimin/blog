@@ -16,7 +16,7 @@ export default function Post(props) {
 }
 
 export function getStaticProps(content: GetStaticPropsContext): GetStaticPropsResult<any> {
-    const metadata = listPosts().find(post => post.id == content.params.id);
+    const metadata = listPosts().find(post => post.id == Number(content.params.id));
     const data = getPostContent(content.params.id);
     return { props: { title: metadata.title, data } };
 }
