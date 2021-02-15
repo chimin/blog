@@ -4,7 +4,7 @@
         <description><![CDATA[c4compile]]></description>
         <link>https://c4compile-2f38c.web.app</link>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Fri, 05 Feb 2021 15:17:57 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 15 Feb 2021 04:32:05 GMT</lastBuildDate>
         <atom:link href="https://c4compile-2f38c.web.apprss.xml" rel="self" type="application/rss+xml"/>
         <item>
             <title><![CDATA[Make a QR code URL generator Chrome extension]]></title>
@@ -44,12 +44,18 @@
             <title><![CDATA[Make a video conference web application - Part 3: Video call]]></title>
             <link>https://c4compile-2f38c.web.app/posts/5</link>
             <guid isPermaLink="true">https://c4compile-2f38c.web.app/posts/5</guid>
+            <category><![CDATA[Angular]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Sat, 18 Jul 2020 15:03:46 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a video conference web application - Part 4: STUN and TURN]]></title>
             <link>https://c4compile-2f38c.web.app/posts/6</link>
             <guid isPermaLink="true">https://c4compile-2f38c.web.app/posts/6</guid>
+            <category><![CDATA[Angular]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Thu, 30 Jul 2020 14:36:38 GMT</pubDate>
         </item>
         <item>

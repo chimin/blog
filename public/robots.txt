@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://c4compile-2f38c.web.app/
+
+# Sitemaps
+Sitemap: https://c4compile-2f38c.web.app/sitemap.xml

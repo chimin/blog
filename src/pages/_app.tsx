@@ -2,13 +2,17 @@ import Head from 'next/head';
 import Link from 'next/link';
 import '../styles/scss/theme-7.scss'
 import '../styles/overrides.scss'
-import { useEffect } from 'react';
+import '../styles/styles.scss'
+import { useEffect, useState } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/analytics';
 import { SubscribeButton } from '../app/comps/SubscribeButton';
 import appConfig from '../data/appConfig.json';
+import { SearchContext } from '../app/contexts/SearchContext';
 
 function MyApp({ Component, pageProps }) {
+  const [searchIsLoaded, setSearchIsLoaded] = useState(false);
+
   useEffect(() => {
     try {
       if (firebase.app()) {
@@ -20,6 +24,17 @@ function MyApp({ Component, pageProps }) {
 
     firebase.initializeApp(appConfig.firebase);
     firebase.analytics();
+  }, []);
+
+  useEffect(() => {
+    (window as any).__gcse = {
+      parsetags: 'explicit',
+      callback: () => setSearchIsLoaded(true)
+    };
+
+    const gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = appConfig.googleSearchJsUrl
+    const s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
   }, []);
 
   return (
@@ -39,19 +54,21 @@ function MyApp({ Component, pageProps }) {
           crossOrigin="anonymous"></script>
       </Head>
 
-      <header className="header">
-        <div className="title"><Link href="/">c4compile</Link></div>
-        <div className="sub">Compile outputs fun</div>
-        <div className="nav">
-          <SubscribeButton />
-        </div>
-      </header>
+      <SearchContext.Provider value={{ isLoaded: searchIsLoaded }}>
+        <header className="header">
+          <div className="title"><Link href="/">c4compile</Link></div>
+          <div className="sub">Compile outputs fun</div>
+          <div className="nav">
+            <SubscribeButton />
+          </div>
+        </header>
 
-      <div className="main-wrapper">
-        <section className="blog-list px-3 py-5 p-md-5">
-          <Component {...pageProps} />
-        </section>
-      </div>
+        <div className="main-wrapper">
+          <section className="blog-list px-3 py-5 p-md-5">
+            <Component {...pageProps} />
+          </section>
+        </div>
+      </SearchContext.Provider>
     </>
   )
 }

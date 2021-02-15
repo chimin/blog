@@ -6,7 +6,8 @@ export interface Post {
     id: number;
     title: string;
     publishDate: string;
-};
+    tags: string[];
+}
 
 export function listPosts(): Post[] {
     return posts.filter(post => post.publishDate);

@@ -21,6 +21,7 @@ export default function PostPage(props: PropsType) {
                 <h2 className="title mb-2">{props.post.title}</h2>
                 <div className="meta mb-3">
                     <span className="date" title={publishDate.format('LLL')}>Published {publishDate.fromNow()}</span>
+                    <span className="tags">{props.post.tags?.join(', ')}</span>
                 </div>
                 <hr />
             </header>

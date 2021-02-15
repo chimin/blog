@@ -1,5 +1,6 @@
 {
     "siteUrl": "https://c4compile-2f38c.web.app",
+    "googleSearchJsUrl": "https://cse.google.com/cse.js?cx=2d7bbbc759862ea0f",
     "firebase": {
         "apiKey": "AIzaSyCNXB6sOLfj7jE55MAhZMOKnAt-x9InnEc",
         "authDomain": "c4compile-2f38c.firebaseapp.com",
