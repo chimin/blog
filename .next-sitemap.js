@@ -1,4 +1,6 @@
+const appConfig = require('./src/data/appConfig.json');
+
 module.exports = {
-    siteUrl: 'https://c4compile-2f38c.web.app/',
+    siteUrl: appConfig.siteUrl,
     generateRobotsTxt: true,
 }
