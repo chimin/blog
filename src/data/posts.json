@@ -186,12 +186,18 @@
     "id": 21,
     "title": "AWS CloudFormation: 06 - Collect logs from Docker instance",
     "publishDate": "2021-03-07T05:26:37Z",
-    "tags": []
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
   },
   {
     "id": 22,
     "title": "AWS CloudFormation: 07 – Build and deploy pipeline for Docker instance",
     "publishDate": "2021-03-14T16:00:05Z",
-    "tags": []
+    "tags": [
+      "AWS",
+      "CloudFormation"
+    ]
   }
 ]

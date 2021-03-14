@@ -4,7 +4,7 @@
         <description><![CDATA[c4compile]]></description>
         <link>https://c4compile.me</link>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Sun, 07 Mar 2021 05:33:27 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 14 Mar 2021 16:04:41 GMT</lastBuildDate>
         <atom:link href="https://c4compile.merss.xml" rel="self" type="application/rss+xml"/>
         <item>
             <title><![CDATA[Make a QR code URL generator Chrome extension]]></title>
@@ -173,12 +173,17 @@
             <title><![CDATA[AWS CloudFormation: 06 - Collect logs from Docker instance]]></title>
             <link>https://c4compile.me/posts/21</link>
             <guid isPermaLink="true">https://c4compile.me/posts/21</guid>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sun, 07 Mar 2021 05:26:37 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 07 – Build and deploy pipeline for Docker instance]]></title>
             <link>https://c4compile.me/posts/22</link>
             <guid isPermaLink="true">https://c4compile.me/posts/22</guid>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
+            <pubDate>Sun, 14 Mar 2021 16:00:05 GMT</pubDate>
         </item>
     </channel>
 </rss>
