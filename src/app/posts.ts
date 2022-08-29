@@ -19,5 +19,12 @@ export function getPostContent(id: Post['id']) {
     }
 
     const filePath = path.join('src/data/posts', `${id}.html`);
-    return fs.readFileSync(filePath, 'utf8');
+    const content = fs.readFileSync(filePath, 'utf8');
+    return content.replace(/https:\/\/c4compile\.me\/\d+\/\d+\/\d+\/(.*)\//g, (matched, encodedTitle: string) => {
+        var normalizedTitle = encodedTitle.toLowerCase().replace(/[^0-9a-z]/g, '');
+        var post = posts.find(post => post.title.toLowerCase().replace(/[^0-9a-z]/g, '') == normalizedTitle);
+        if (!post) return matched;
+
+        return `/posts/${post.id}`;
+    });
 }

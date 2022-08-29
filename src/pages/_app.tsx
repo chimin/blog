@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
   const [searchIsLoaded, setSearchIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!location.href.startsWith(appConfig.siteUrl)) {
+    if (!location.href.startsWith(appConfig.siteUrl) && !location.href.startsWith('http://localhost:')) {
       location.href = appConfig.siteUrl;
     }
   });
