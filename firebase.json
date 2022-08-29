@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "c4compile",
     "public": "out",
     "ignore": [
       "firebase.json",

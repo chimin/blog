@@ -14,6 +14,12 @@ function MyApp({ Component, pageProps }) {
   const [searchIsLoaded, setSearchIsLoaded] = useState(false);
 
   useEffect(() => {
+    if (!location.href.startsWith(appConfig.siteUrl)) {
+      location.href = appConfig.siteUrl;
+    }
+  });
+
+  useEffect(() => {
     try {
       if (firebase.app()) {
         return;
@@ -32,9 +38,13 @@ function MyApp({ Component, pageProps }) {
       callback: () => setSearchIsLoaded(true)
     };
 
-    const gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    const gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
     gcse.src = appConfig.googleSearchJsUrl
-    const s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+
+    const s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
   }, []);
 
   return (
@@ -45,7 +55,7 @@ function MyApp({ Component, pageProps }) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="google-site-verification" content="96kPM_TE1Be7P1FKbhAOqqjnMe8rUc8W-AdptWWIWGo" />
+        <meta name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
 
         <link rel="alternate" type="application/rss+xml" href="rss.xml" />
 

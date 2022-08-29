@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://c4compile.me
+Host: https://c4compile.web.app
 
 # Sitemaps
-Sitemap: https://c4compile.me/sitemap.xml
+Sitemap: https://c4compile.web.app/sitemap.xml
