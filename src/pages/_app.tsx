@@ -20,13 +20,7 @@ function MyApp({ Component, pageProps }) {
   });
 
   useEffect(() => {
-    try {
-      if (firebase.app()) {
-        return;
-      }
-    } catch (e) {
-      return;
-    }
+    if (firebase.apps.length) return;
 
     firebase.initializeApp(appConfig.firebase);
     firebase.analytics();
@@ -47,6 +41,18 @@ function MyApp({ Component, pageProps }) {
     s.parentNode.insertBefore(gcse, s);
   }, []);
 
+  const topAd = `
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7352271602634363"
+  crossorigin="anonymous"></script>
+<!-- Top ad -->
+<ins class="adsbygoogle"
+  style="display:block;width:728px;height:50px;margin:auto"
+  data-ad-client="ca-pub-7352271602634363"
+  data-ad-slot="2478298726"></ins>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+</script>`;
+
   return (
     <>
       <Head>
@@ -58,6 +64,9 @@ function MyApp({ Component, pageProps }) {
         <meta name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
 
         <link rel="alternate" type="application/rss+xml" href="rss.xml" />
+
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7352271602634363"
+          crossOrigin="anonymous"></script>
 
         <script defer
           src="https://use.fontawesome.com/releases/v5.7.1/js/all.js"
@@ -75,6 +84,10 @@ function MyApp({ Component, pageProps }) {
         </header>
 
         <div className="main-wrapper">
+          <section className="top-ad px-3 pt-3 pb-1">
+            <div dangerouslySetInnerHTML={{ __html: topAd }} />
+          </section>
+
           <section className="blog-list px-3 py-5 p-md-5">
             <Component {...pageProps} />
           </section>
