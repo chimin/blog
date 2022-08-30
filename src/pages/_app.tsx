@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Script from 'next/script';
 import '../styles/scss/theme-7.scss'
 import '../styles/overrides.scss'
 import '../styles/styles.scss'
@@ -17,7 +18,7 @@ function MyApp({ Component, pageProps }) {
     if (!location.href.startsWith(appConfig.siteUrl) && !location.href.startsWith('http://localhost:')) {
       location.href = appConfig.siteUrl;
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (firebase.apps.length) return;
@@ -58,20 +59,20 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <title>c4compile</title>
 
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-        <meta name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
+        <meta key="charset" charSet="utf-8" />
+        <meta key="compatible" httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta key="viewpot" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <meta key="google-site-verification" name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
 
-        <link rel="alternate" type="application/rss+xml" href="rss.xml" />
+        <link key="rss" rel="alternate" type="application/rss+xml" href="rss.xml" />
 
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7352271602634363"
-          crossOrigin="anonymous"></script>
+        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7352271602634363"
+          crossOrigin="anonymous"></Script>
 
-        <script defer
+        <Script defer
           src="https://use.fontawesome.com/releases/v5.7.1/js/all.js"
           integrity="sha384-eVEQC9zshBn0rFj4+TU78eNA19HMNigMviK/PU/FFjLXqa/GKPgX58rvt5Z8PLs7"
-          crossOrigin="anonymous"></script>
+          crossOrigin="anonymous"></Script>
       </Head>
 
       <SearchContext.Provider value={{ isLoaded: searchIsLoaded }}>

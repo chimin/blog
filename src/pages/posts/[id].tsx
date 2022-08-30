@@ -13,7 +13,7 @@ interface PropsType {
 export default function PostPage(props: PropsType) {
     return (
         <>
-            <Head>
+            <Head key="post">
                 <title>{props.post.title} - c4compile</title>
             </Head>
             <PostHeader post={props.post} />
