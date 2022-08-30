@@ -3,6 +3,7 @@ import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } fro
 import { getPostContent, listPosts, Post } from '../../app/posts';
 import { CommentBox } from '../../app/comps/CommentBox';
 import moment from 'moment';
+import { PostHeader } from '../../app/comps/PostHeader';
 
 interface PropsType {
     post: Post;
@@ -10,22 +11,13 @@ interface PropsType {
 }
 
 export default function PostPage(props: PropsType) {
-    const publishDate = moment(props.post.publishDate);
-
     return (
         <>
             <Head>
                 <title>{props.post.title} - c4compile</title>
             </Head>
-            <header className="blog-post-header">
-                <h2 className="title mb-2">{props.post.title}</h2>
-                <div className="meta mb-3">
-                    <span className="date" title={publishDate.format('LLL')}>Published {publishDate.fromNow()}</span>
-                    <span className="tags">{props.post.tags?.join(', ')}</span>
-                </div>
-                <hr />
-            </header>
-            <div dangerouslySetInnerHTML={{ __html: props.postContent }} />
+            <PostHeader post={props.post} />
+            <div className="post" dangerouslySetInnerHTML={{ __html: props.postContent }} />
             <CommentBox />
         </>
     );

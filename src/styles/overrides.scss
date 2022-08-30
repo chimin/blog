@@ -38,34 +38,38 @@
   max-width: 1000px;
 }
 
-.wp-block-table {
-  table {
-    td {
-      border: 1px solid #eee;
-      vertical-align: top;
-      padding: 0.5em;
+.post {
+  .wp-block-table {
+    overflow-x: auto;
 
-      code {
-        white-space: nowrap;
+    table {
+      td {
+        border: 1px solid #eee;
+        vertical-align: top;
+        padding: 0.5em;
+
+        code {
+          white-space: nowrap;
+        }
       }
     }
   }
-}
 
-.wp-block-image {
-  img {
-    max-width: 100%;
+  .wp-block-image {
+    img {
+      max-width: 100%;
+    }
   }
-}
 
-.wp-block-syntaxhighlighter-code,
-code {
-  color: #e83e8c;
-  background: #eee;
-  padding: 0.5em;
-  display: block;
-}
+  .wp-block-syntaxhighlighter-code,
+  code {
+    color: #e83e8c;
+    background: #eee;
+    padding: 0.5em;
+    display: block;
+  }
 
-.aligncenter {
-  text-align: center;
+  .aligncenter {
+    text-align: center;
+  }
 }

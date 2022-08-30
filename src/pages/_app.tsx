@@ -60,7 +60,7 @@ function MyApp({ Component, pageProps }) {
 
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
         <meta name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
 
         <link rel="alternate" type="application/rss+xml" href="rss.xml" />

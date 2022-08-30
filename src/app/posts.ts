@@ -19,6 +19,10 @@ export function getPostContent(id: Post['id']) {
     }
 
     const filePath = path.join('src/data/posts', `${id}.html`);
+    if (!fs.existsSync(filePath)) {
+        return;
+    }
+
     const content = fs.readFileSync(filePath, 'utf8');
     return content.replace(/https:\/\/c4compile\.me\/\d+\/\d+\/\d+\/(.*)\//g, (matched, encodedTitle: string) => {
         var normalizedTitle = encodedTitle.toLowerCase().replace(/[^0-9a-z]/g, '');
