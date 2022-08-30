@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { GetStaticPropsResult } from 'next';
-import { listPosts, Post } from '../app/posts';
+import { listPostsAsync, Post } from '../app/posts';
 import { PostListItem } from '../app/comps/PostListItem';
 import { SearchBox } from '../app/comps/SearchBox';
 
@@ -21,7 +21,7 @@ export default function HomePage(props: PropsType) {
   );
 }
 
-export function getStaticProps(): GetStaticPropsResult<PropsType> {
-  const posts = listPosts().slice(0).reverse();
+export async function getStaticProps(): Promise<GetStaticPropsResult<PropsType>> {
+  const posts = (await listPostsAsync()).slice(0).reverse();
   return { props: { posts } };
 }
