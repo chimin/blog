@@ -1,12 +1,12 @@
 import { useContext, useEffect, useRef } from 'react';
-import { SearchContext } from '../contexts/SearchContext';
+import { useSearchIsLoaded } from '../states/SearchState';
 
 export function SearchBox() {
-    const searchContext = useContext(SearchContext);
+    const searchIsLoaded = useSearchIsLoaded();
     const divRef = useRef<HTMLDivElement>();
 
     useEffect(() => {
-        if (searchContext.isLoaded) {
+        if (searchIsLoaded) {
             (window as any).google.search.cse.element.render({
                 div: divRef.current,
                 tag: 'search',
@@ -18,7 +18,7 @@ export function SearchBox() {
                 divRef.current.innerHTML = '';
             }
         };
-    }, [searchContext.isLoaded]);
+    }, [searchIsLoaded]);
 
     return (
         <div className="search-box">

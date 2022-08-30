@@ -9,11 +9,10 @@ import firebase from 'firebase/app';
 import 'firebase/analytics';
 import { SubscribeButton } from '../app/comps/SubscribeButton';
 import appConfig from '../data/appConfig.json';
-import { SearchContext } from '../app/contexts/SearchContext';
+import { initializeSearch } from '../app/states/SearchState';
+import { TopAd } from '../app/comps/TopAd';
 
 function MyApp({ Component, pageProps }) {
-  const [searchIsLoaded, setSearchIsLoaded] = useState(false);
-
   useEffect(() => {
     if (!location.href.startsWith(appConfig.siteUrl) && !location.href.startsWith('http://localhost:')) {
       location.href = appConfig.siteUrl;
@@ -28,31 +27,8 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   useEffect(() => {
-    (window as any).__gcse = {
-      parsetags: 'explicit',
-      callback: () => setSearchIsLoaded(true)
-    };
-
-    const gcse = document.createElement('script');
-    gcse.type = 'text/javascript';
-    gcse.async = true;
-    gcse.src = appConfig.googleSearchJsUrl
-
-    const s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(gcse, s);
+    initializeSearch();
   }, []);
-
-  const topAd = `
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7352271602634363"
-  crossorigin="anonymous"></script>
-<!-- Top ad -->
-<ins class="adsbygoogle"
-  style="display:block;width:728px;height:50px;margin:auto"
-  data-ad-client="ca-pub-7352271602634363"
-  data-ad-slot="2478298726"></ins>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
-</script>`;
 
   return (
     <>
@@ -75,25 +51,23 @@ function MyApp({ Component, pageProps }) {
           crossOrigin="anonymous"></Script>
       </Head>
 
-      <SearchContext.Provider value={{ isLoaded: searchIsLoaded }}>
-        <header className="header">
-          <div className="title"><Link href="/">c4compile</Link></div>
-          <div className="sub">Compile outputs fun</div>
-          <div className="nav">
-            <SubscribeButton />
-          </div>
-        </header>
-
-        <div className="main-wrapper">
-          <section className="top-ad px-3 pt-3 pb-1">
-            <div dangerouslySetInnerHTML={{ __html: topAd }} />
-          </section>
-
-          <section className="blog-list px-3 py-5 p-md-5">
-            <Component {...pageProps} />
-          </section>
+      <header className="header">
+        <div className="title"><Link href="/">c4compile</Link></div>
+        <div className="sub">Compile outputs fun</div>
+        <div className="nav">
+          <SubscribeButton />
         </div>
-      </SearchContext.Provider>
+      </header>
+
+      <div className="main-wrapper">
+        <section className="top-ad px-3 pt-3 pb-1">
+          <TopAd />
+        </section>
+
+        <section className="blog-list px-3 py-5 p-md-5">
+          <Component {...pageProps} />
+        </section>
+      </div>
     </>
   )
 }
