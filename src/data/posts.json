@@ -86,7 +86,7 @@
   },
   {
     "id": 10,
-    "title": "Make a note taking app with Firestore – Part 2.1 Mobile application",
+    "title": "Make a note taking app with Firestore - Part 2.1 Mobile application",
     "publishDate": "2020-10-10T12:48:02.000Z",
     "tags": [
       "ReactNative",
@@ -95,7 +95,7 @@
   },
   {
     "id": 11,
-    "title": "Make a note taking app with Firestore – Part 2.2 Text editor",
+    "title": "Make a note taking app with Firestore - Part 2.2 Text editor",
     "publishDate": "2020-10-18T02:57:49.000Z",
     "tags": [
       "ReactNative",
@@ -123,7 +123,7 @@
   },
   {
     "id": 14,
-    "title": "Lerna to manage multiple modules – Site killer extension for Chrome and Firefox – Part 2",
+    "title": "Lerna to manage multiple modules - Site killer extension for Chrome and Firefox - Part 2",
     "publishDate": "2020-11-14T04:18:23.000Z",
     "tags": [
       "Typescript"
@@ -131,7 +131,7 @@
   },
   {
     "id": 15,
-    "title": "Lerna to manage multiple modules – Site killer extension for Chrome and Firefox – Part 3",
+    "title": "Lerna to manage multiple modules - Site killer extension for Chrome and Firefox - Part 3",
     "publishDate": "2020-11-22T05:16:04.000Z",
     "tags": [
       "Typescript"
@@ -193,7 +193,7 @@
   },
   {
     "id": 22,
-    "title": "AWS CloudFormation: 07 – Build and deploy pipeline for Docker instance",
+    "title": "AWS CloudFormation: 07 - Build and deploy pipeline for Docker instance",
     "publishDate": "2021-03-14T16:00:05Z",
     "tags": [
       "AWS",
