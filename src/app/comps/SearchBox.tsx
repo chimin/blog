@@ -6,16 +6,17 @@ export function SearchBox() {
     const divRef = useRef<HTMLDivElement>();
 
     useEffect(() => {
+        const div = divRef.current;
         if (searchIsLoaded) {
             (window as any).google.search.cse.element.render({
-                div: divRef.current,
+                div: div,
                 tag: 'search',
             });
         }
 
         return () => {
-            if (divRef.current) {
-                divRef.current.innerHTML = '';
+            if (div) {
+                div.innerHTML = '';
             }
         };
     }, [searchIsLoaded]);

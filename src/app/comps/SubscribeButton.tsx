@@ -5,5 +5,5 @@ export function SubscribeButton() {
         url: `${appConfig.siteUrl}/rss.xml`
     });
 
-    return <a href={url} target="_blank">Subscribe</a>;
+    return <a href={url} target="_blank" rel="noreferrer">Subscribe</a>;
 }
