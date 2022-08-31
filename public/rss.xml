@@ -4,90 +4,108 @@
         <description><![CDATA[c4compile]]></description>
         <link>https://c4compile.web.app</link>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Wed, 31 Aug 2022 01:50:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 31 Aug 2022 08:31:52 GMT</lastBuildDate>
         <atom:link href="https://c4compile.web.apprss.xml" rel="self" type="application/rss+xml"/>
         <item>
             <title><![CDATA[Make a QR code URL generator Chrome extension]]></title>
             <link>https://c4compile.web.app/posts/1</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/1</guid>
-            <category><![CDATA[Chrome, Typescript]]></category>
+            <category><![CDATA[Chrome]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sat, 02 May 2020 04:15:31 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a JSON formatter Chrome extension]]></title>
             <link>https://c4compile.web.app/posts/2</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/2</guid>
-            <category><![CDATA[Chrome, Typescript]]></category>
+            <category><![CDATA[Chrome]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Thu, 07 May 2020 08:31:10 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a video conference web application - Part 1: Signaling server]]></title>
             <link>https://c4compile.web.app/posts/3</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/3</guid>
-            <category><![CDATA[NodeJS, Typescript, WebRTC]]></category>
+            <category><![CDATA[NodeJS]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Sat, 27 Jun 2020 14:46:22 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a video conference web application - Part 2: Browser application]]></title>
             <link>https://c4compile.web.app/posts/4</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/4</guid>
-            <category><![CDATA[Angular, Typescript, WebRTC]]></category>
+            <category><![CDATA[Angular]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Sun, 05 Jul 2020 02:06:39 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a video conference web application - Part 3: Video call]]></title>
             <link>https://c4compile.web.app/posts/5</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/5</guid>
-            <category><![CDATA[Angular, Typescript, WebRTC]]></category>
+            <category><![CDATA[Angular]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Sat, 18 Jul 2020 15:03:46 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a video conference web application - Part 4: STUN and TURN]]></title>
             <link>https://c4compile.web.app/posts/6</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/6</guid>
-            <category><![CDATA[Angular, Typescript, WebRTC]]></category>
+            <category><![CDATA[Angular]]></category>
+            <category><![CDATA[Typescript]]></category>
+            <category><![CDATA[WebRTC]]></category>
             <pubDate>Thu, 30 Jul 2020 14:36:38 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a note taking app with Firestore - Part 1.1 Google authentication]]></title>
             <link>https://c4compile.web.app/posts/7</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/7</guid>
-            <category><![CDATA[ReactJS, Typescript]]></category>
+            <category><![CDATA[ReactJS]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sat, 12 Sep 2020 13:58:30 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a note taking app with Firestore - Part 1.2 Markdown editor]]></title>
             <link>https://c4compile.web.app/posts/8</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/8</guid>
-            <category><![CDATA[ReactJS, Typescript]]></category>
+            <category><![CDATA[ReactJS]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sat, 19 Sep 2020 12:45:05 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a note taking app with Firestore - Part 1.3 Firestore]]></title>
             <link>https://c4compile.web.app/posts/9</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/9</guid>
-            <category><![CDATA[ReactJS, Typescript]]></category>
+            <category><![CDATA[ReactJS]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sat, 26 Sep 2020 07:20:55 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a note taking app with Firestore - Part 2.1 Mobile application]]></title>
             <link>https://c4compile.web.app/posts/10</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/10</guid>
-            <category><![CDATA[ReactNative, Typescript]]></category>
+            <category><![CDATA[ReactNative]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sat, 10 Oct 2020 12:48:02 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Make a note taking app with Firestore - Part 2.2 Text editor]]></title>
             <link>https://c4compile.web.app/posts/11</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/11</guid>
-            <category><![CDATA[ReactNative, Typescript]]></category>
+            <category><![CDATA[ReactNative]]></category>
+            <category><![CDATA[Typescript]]></category>
             <pubDate>Sun, 18 Oct 2020 02:57:49 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Performance of different web application framework]]></title>
             <link>https://c4compile.web.app/posts/12</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/12</guid>
-            <category><![CDATA[.NET Core, Java, Kotlin, Spring Boot]]></category>
+            <category><![CDATA[.NET Core]]></category>
+            <category><![CDATA[Java]]></category>
+            <category><![CDATA[Kotlin]]></category>
+            <category><![CDATA[Spring Boot]]></category>
             <pubDate>Sun, 01 Nov 2020 07:24:56 GMT</pubDate>
         </item>
         <item>
@@ -115,49 +133,56 @@
             <title><![CDATA[AWS CloudFormation: 01 - Create a web server EC2 instance]]></title>
             <link>https://c4compile.web.app/posts/16</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/16</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Tue, 29 Dec 2020 13:15:52 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 02 - Create an auto scaling group]]></title>
             <link>https://c4compile.web.app/posts/17</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/17</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Wed, 13 Jan 2021 15:56:27 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 03 - Collect logs]]></title>
             <link>https://c4compile.web.app/posts/18</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/18</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sat, 16 Jan 2021 13:10:48 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 04 - Build and deploy pipeline]]></title>
             <link>https://c4compile.web.app/posts/19</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/19</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sat, 23 Jan 2021 14:11:41 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 05 - Create a web server Docker instance]]></title>
             <link>https://c4compile.web.app/posts/20</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/20</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sat, 30 Jan 2021 07:33:50 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 06 - Collect logs from Docker instance]]></title>
             <link>https://c4compile.web.app/posts/21</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/21</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sun, 07 Mar 2021 05:26:37 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[AWS CloudFormation: 07 - Build and deploy pipeline for Docker instance]]></title>
             <link>https://c4compile.web.app/posts/22</link>
             <guid isPermaLink="true">https://c4compile.web.app/posts/22</guid>
-            <category><![CDATA[AWS, CloudFormation]]></category>
+            <category><![CDATA[AWS]]></category>
+            <category><![CDATA[CloudFormation]]></category>
             <pubDate>Sun, 14 Mar 2021 16:00:05 GMT</pubDate>
         </item>
     </channel>

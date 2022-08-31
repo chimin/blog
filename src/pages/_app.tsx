@@ -39,6 +39,7 @@ function MyApp({ Component, pageProps }) {
         <meta key="compatible" httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta key="viewpot" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
         <meta key="google-site-verification" name="google-site-verification" content="fPu4m-YbBKW9n0ELcvicbtB8a6F11uThdjXHTiDfYno" />
+        <meta key="ahrefs-site-verification" name="ahrefs-site-verification" content="713416b82ae79e7f91b3e04c94a9c71d63d626b5d1001a8f3b39a0cc96dfc6e1" />
 
         <link key="rss" rel="alternate" type="application/rss+xml" href="rss.xml" />
       </Head>

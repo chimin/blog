@@ -1,5 +1,3 @@
-import Script from "next/script";
-import { useEffect, useRef } from "react";
 import { EmbedGithub } from "../../app/comps/EmbedGithub";
 import { PostHeader } from "../../app/comps/PostHeader"
 import { Post } from "../../app/posts"

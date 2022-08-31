@@ -30,7 +30,7 @@ export async function getStaticProps(context: GetStaticPropsContext): Promise<Ge
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const posts = await listPostsAsync();
-  const tags = [...new Set(posts.flatMap(p => p.tags))];
+  const tags = Array.from(new Set(posts.flatMap(p => p.tags)));
   return {
     paths: tags.map(tag => ({ params: { tag } })),
     fallback: false
