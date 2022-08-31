@@ -10,7 +10,8 @@ export interface Post {
     tags: string[];
 }
 
-const dataDirectory = 'src/data/posts';
+const postsDataDirectory = 'src/data/posts';
+const postsPageDirectory = 'src/pages/posts';
 
 var posts: Post[];
 
@@ -19,14 +20,14 @@ async function initializePostsAsync() {
 
     posts = [];
 
-    const files = fs.readdirSync(dataDirectory);
-    for (const fileName of files) {
+    const postsDataFiles = fs.readdirSync(postsDataDirectory);
+    for (const fileName of postsDataFiles) {
         const post: Partial<Post> = {
             id: Number(path.basename(fileName, path.extname(fileName)))
         };
 
         var isCompleted = false;
-        const rl = readline.createInterface(fs.createReadStream(path.join(dataDirectory, fileName)));
+        const rl = readline.createInterface(fs.createReadStream(path.join(postsDataDirectory, fileName)));
         rl.on('line', line => {
             if (isCompleted) return;
 
@@ -42,11 +43,50 @@ async function initializePostsAsync() {
             switch (key) {
                 case 'title': post.title = value; break;
                 case 'publishDate': post.publishDate = value; break;
-                case 'tags': post.tags = value.split(/\s+,\s+/); break;
+                case 'tags': post.tags = value.split(/\s*,\s*/); break;
                 default: throw new Error(`Unrecognized key ${key}`);
             }
         });
         await once(rl, 'close');
+
+        if (!post.publishDate) continue;
+
+        posts.push(post as Post);
+    }
+
+    const postsPageFiles = fs.readdirSync(postsPageDirectory);
+    for (const fileName of postsPageFiles) {
+        const expectedPostId = Number(path.basename(fileName, path.extname(fileName)));
+        if (isNaN(expectedPostId)) continue;
+
+        var isDataStarted = false;
+        var isCompleted = false;
+        var content = '';
+        const rl = readline.createInterface(fs.createReadStream(path.join(postsPageDirectory, fileName)));
+        rl.on('line', line => {
+            if (isCompleted) return;
+
+            if (!isDataStarted) {
+                isDataStarted = line == 'const post: Post = {';
+                return;
+            }
+
+            isCompleted = line == '};';
+            if (isCompleted) {
+                rl.close();
+                return;
+            }
+
+            content += line + '\n';
+        });
+        await once(rl, 'close');
+
+        const post = JSON.parse('{' + content + '}') as Post;
+        if (post.id != expectedPostId)
+            throw new Error(`Error parsing ${fileName}. Expected post ID to be ${expectedPostId} but got ${post.id}`);
+
+            if (!post.publishDate) continue;
+
         posts.push(post as Post);
     }
 
@@ -66,7 +106,7 @@ export async function getPostContentAsync(id: Post['id']) {
         return;
     }
 
-    const filePath = path.join(dataDirectory, `${id}.html`);
+    const filePath = path.join(postsDataDirectory, `${id}.html`);
     if (!fs.existsSync(filePath)) {
         return;
     }

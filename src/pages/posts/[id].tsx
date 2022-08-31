@@ -12,9 +12,6 @@ interface PropsType {
 export default function PostPage(props: PropsType) {
     return (
         <>
-            <Head>
-                <title>{props.post.title} - c4compile</title>
-            </Head>
             <PostHeader post={props.post} />
             <div className="post" dangerouslySetInnerHTML={{ __html: props.postContent }} />
             <CommentBox />
@@ -22,9 +19,12 @@ export default function PostPage(props: PropsType) {
     );
 }
 
-export async function getStaticProps(content: GetStaticPropsContext): Promise<GetStaticPropsResult<PropsType>> {
-    const metadata = (await listPostsAsync()).find(post => post.id == Number(content.params.id));
-    const data = await getPostContentAsync(Number(content.params.id));
+export async function getStaticProps(context: GetStaticPropsContext): Promise<GetStaticPropsResult<PropsType>> {
+    const postId = Number(context.params.id);
+    const metadata = (await listPostsAsync()).find(post => post.id == postId);
+    if (!metadata) return { notFound: true };
+
+    const data = await getPostContentAsync(Number(context.params.id));
     return { props: { post: metadata, postContent: data } };
 }
 
