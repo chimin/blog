@@ -51,8 +51,6 @@ async function initializePostsAsync() {
     }
 
     posts.sort((a, b) => a.id - b.id);
-
-    console.log(posts);
 }
 
 export async function listPostsAsync(): Promise<Post[]> {

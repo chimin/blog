@@ -4,7 +4,7 @@ import Script from 'next/script';
 import '../styles/scss/theme-7.scss'
 import '../styles/overrides.scss'
 import '../styles/styles.scss'
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/analytics';
 import { SubscribeButton } from '../app/comps/SubscribeButton';

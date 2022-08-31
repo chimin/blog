@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { GetStaticPropsResult } from 'next';
 import { listPostsAsync, Post } from '../app/posts';
 import { PostListItem } from '../app/comps/PostListItem';

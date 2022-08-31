@@ -2,7 +2,6 @@ import Head from 'next/head';
 import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } from 'next';
 import { getPostContentAsync, listPostsAsync, Post } from '../../app/posts';
 import { CommentBox } from '../../app/comps/CommentBox';
-import moment from 'moment';
 import { PostHeader } from '../../app/comps/PostHeader';
 
 interface PropsType {

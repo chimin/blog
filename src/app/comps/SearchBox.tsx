@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchIsLoaded } from '../states/SearchState';
 
 export function SearchBox() {
