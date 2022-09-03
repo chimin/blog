@@ -261,7 +261,8 @@ export default function postPage() {
                 <li>a API at `/admin/something` that only allowed authorized user to access it</li>
                 <li>a API at `/super-admin/something` that only allowed authorized user with `SUPER_ADMIN` role to access it</li>
             </ul>
-            All the code are in respective modules
+            All the code are in respective modules.
+            The full source code is <a href="https://github.com/chimin/blog-codes/tree/master/jwt-demo" target="_blank">here</a>.
         </p>
 
         <CommentBox />

@@ -57,6 +57,8 @@ function MyApp({ Component, pageProps }) {
         <div className="sub">Compile outputs fun</div>
         <div className="nav">
           <SubscribeButton />
+          /
+          <a href="mailto:fantazier@hotmail.com">Contact me</a>
         </div>
       </header>
 
