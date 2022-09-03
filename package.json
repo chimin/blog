@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:plantuml": "docker run -d -p 10001:8080 plantuml/plantuml-server:jetty",
     "build": "next build",
     "build:rss": "ts-node --project utils/tsconfig.json utils/build-rss.ts",
     "build:sitemap-xml": "ts-node --project utils/tsconfig.json utils/build-sitemap-xml.ts",
