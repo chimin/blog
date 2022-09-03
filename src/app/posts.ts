@@ -8,6 +8,7 @@ export interface Post {
     title: string;
     publishDate: string;
     tags: string[];
+    type?: 'legacy';
 }
 
 const postsDataDirectory = 'src/data/posts';
@@ -85,7 +86,9 @@ async function initializePostsAsync() {
         if (post.id != expectedPostId)
             throw new Error(`Error parsing ${fileName}. Expected post ID to be ${expectedPostId} but got ${post.id}`);
 
-            if (!post.publishDate) continue;
+        if (!post.publishDate) continue;
+
+        post.type = 'legacy';
 
         posts.push(post as Post);
     }

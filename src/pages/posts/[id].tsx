@@ -28,7 +28,7 @@ export async function getStaticProps(context: GetStaticPropsContext): Promise<Ge
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-    const posts = await listPostsAsync();
+    const posts = (await listPostsAsync()).filter(p => !p.type);
     return {
         paths: posts.map(post => ({ params: { id: String(post.id) } })),
         fallback: false

@@ -6,7 +6,7 @@ import { Post } from "../../app/posts"
 const post: Post = {
     "id": 23,
     "title": "Spring Boot series: API server with JWT authentication",
-    "publishDate": "",
+    "publishDate": "2022-09-03T15:54:45Z",
     "tags": ["Java", "Spring Boot", "OAuth2", "API"]
 };
 
@@ -28,7 +28,7 @@ export default function postPage() {
 
         <p>
             We will only focus on the microservice part.
-            I'm using <a href="https://www.keycloak.org/" target="_blank">Keycloak</a> as the authorization server but you can use any authorization server.
+            I'm using <a href="https://www.keycloak.org/" target="_blank" rel="noreferrer">Keycloak</a> as the authorization server but you can use any authorization server.
         </p>
 
         <h1>Plan of attack</h1>
@@ -63,7 +63,7 @@ export default function postPage() {
         <h2>2. Create a Spring Boot project</h2>
 
         <p>
-            Use <a href="https://start.spring.io/" target="_blank">Spring Initializr</a> to create a new project with this configuration
+            Use <a href="https://start.spring.io/" target="_blank" rel="noreferrer">Spring Initializr</a> to create a new project with this configuration
         </p>
 
         <ul>
@@ -262,7 +262,7 @@ export default function postPage() {
                 <li>a API at `/super-admin/something` that only allowed authorized user with `SUPER_ADMIN` role to access it</li>
             </ul>
             All the code are in respective modules.
-            The full source code is <a href="https://github.com/chimin/blog-codes/tree/master/jwt-demo" target="_blank">here</a>.
+            The full source code is <a href="https://github.com/chimin/blog-codes/tree/master/jwt-demo" target="_blank" rel="noreferrer">here</a>.
         </p>
 
         <CommentBox />
